@@ -1,0 +1,16 @@
+﻿# clion
+.idea/
+cmake-build-debug/*
+
+# vs
+.vs
+Analyzer/x64/*
+AVSAlgorithm/x64/*
+AVSAlarmManage/x64/*
+
+x64/*
+
+3rdparty/*
+
+
+
