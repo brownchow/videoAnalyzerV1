@@ -7,13 +7,13 @@
 * 微信：bilibili_bxc
 * 哔哩哔哩主页：https://space.bilibili.com/487906612
 * gitee开源地址：https://gitee.com/Vanishi/BXC_VideoAnalyzer_v1
-* github开源地址：https://github.com/any12345com/BXC_VideoAnalyzer_v1
+
 
 ### 软件版本介绍
 * v1版本开源地址 https://gitee.com/Vanishi/BXC_VideoAnalyzer_v1
 * v2版本开源地址 https://gitee.com/Vanishi/BXC_VideoAnalyzer_v2
 * v3版本安装包下载地址 https://gitee.com/Vanishi/BXC_VideoAnalyzer_v3
-* v4版本安装包下载地址 https://gitee.com/Vanishi/BXC_VideoAnalyzer_v4
+* v4版本安装包下载地址 https://gitee.com/Vanishi/xcms
 
 #### v1版本架构介绍
 ~~~
