@@ -26,6 +26,10 @@ python -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/s
 ### 启动
 
 ~~~
+
+// 初始化数据库
+python manage.py migrate
+
 //启动后台管理服务
 python manage.py runserver 0.0.0.0:9001
 

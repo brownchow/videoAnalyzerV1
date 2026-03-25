@@ -1,2 +1,0 @@
-MediaServer.exe
-cmd

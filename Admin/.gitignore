@@ -9,3 +9,5 @@ app/__pycache__
 framework/__pycache__
 static/upload/alarm/*
 
+**/*.pyc
+
