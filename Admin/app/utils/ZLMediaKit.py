@@ -4,7 +4,8 @@ import inspect
 class ZLMediaKit():
     def __init__(self,mediaApiHost,mediaHttpHost,mediaRtmpHost):
         self.mediaApiHost = mediaApiHost
-        self.secret = "035c73f7-bb6b-4889-a715-d9eb2d1925cc"
+        # ZLMediaKit API密钥，需与 zlm/config.ini 中 [api] secret 配置保持一致
+        self.secret = "GPOpt7H6R5bniTvMkxOn5XP25dL0KpiI"
         self.default_push_stream_app = "analyzer"
 
         self.mediaHttpHost = mediaHttpHost
