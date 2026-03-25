@@ -10,8 +10,11 @@ venv*
 logs*
 log/*
 zlm/log*
+zlm/MediaServer
+zlm/www/*
 
 
 **/*.pyc
 
 
+Admin/Admin.sqlite3
