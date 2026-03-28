@@ -10,16 +10,16 @@
 ~~~
 
 # 创建虚拟环境
-python -m venv venv
+python3 -m venv venv
 
 # 切换到虚拟环境
 venv\Scripts\activate
 
 # 更新虚拟环境的pip版本
-python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+python3 -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 在虚拟环境中安装依赖库
-python -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+python3 -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 ~~~
 
@@ -28,12 +28,13 @@ python -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/s
 ~~~
 
 // 初始化数据库
-python manage.py migrate
+python3 manage.py migrate
 
-//启动后台管理服务
-python manage.py runserver 0.0.0.0:9001
+// 启动后台管理服务
+// 启动前确认 9001 端口没有被 rustfs 占用 sudo systemctl stop  rustfs
+python3 manage.py runserver 0.0.0.0:9001
 
-//默认用户
+// 默认用户
 用户名：admin 密码：admin888
 
 ~~~
