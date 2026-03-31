@@ -76,7 +76,7 @@ make clean
 ### 2. 编译项目
 
 ```bash
-make
+make -j8
 ```
 
 编译过程将生成名为 `analyzer` 的可执行文件。
