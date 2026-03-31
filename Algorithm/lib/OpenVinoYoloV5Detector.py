@@ -2,9 +2,7 @@ import cv2
 import numpy as np
 import time
 
-# openvino 2022.1.0 has requirement numpy<1.20,>=1.16.6
-from openvino.runtime import Core  # the version of openvino >= 2022.1
-from openvino.inference_engine import IECore # the version of openvino <= 2021.4.2
+import openvino as ov
 
 
 classes = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
@@ -21,12 +19,8 @@ class OpenVinoYoloV5Detector():
 
     def __init__(self,IN_conf):
 
-        # ie = Core()  # Initialize Core version>=2022.1
-        # self.Net = ie.compile_model(model=IN_conf.get("weight_file"),device_name=IN_conf.get("device"))
-
-
-        ie = IECore()  # Initialize IECore  openvino <= 2021.4.2
-        self.Net = ie.load_network(network=IN_conf.get("weight_file"), device_name=IN_conf.get("device"))
+        ie = ov.Core()
+        self.Net = ie.compile_model(model=IN_conf.get("weight_file"), device_name=IN_conf.get("device"))
 
         self.INPUT_HEIGHT = 640
         self.INPUT_WIDTH = 640
@@ -105,13 +99,8 @@ class OpenVinoYoloV5Detector():
         blob = cv2.dnn.blobFromImage(input_img, 1 / 255.0, (self.INPUT_WIDTH, self.INPUT_HEIGHT), swapRB=True,
                                      crop=False)
 
-        # openvino >= 2022.1
-        # results = net([blob])[next(iter(net.outputs))]
-        # results = self.Net([blob])[self.Net.output(0)]
-
-        # openvino <= 2021.4.2
-        results = self.Net.infer(inputs={"images": blob})
-        results = results["output"]
+        results = self.Net(blob)
+        results = results[0]
 
 
         h,w, _ = input_img.shape

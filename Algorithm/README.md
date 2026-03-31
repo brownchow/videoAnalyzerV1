@@ -9,24 +9,27 @@
 ### 安装依赖库
 ~~~
 
+# 删除旧虚拟环境
+rm -rf myenv
+
 # 创建虚拟环境
-python -m venv venv
+python3 -m venv myenv
 
 # 切换到虚拟环境
-venv\Scripts\activate
+source myenv/bin/activate
 
 # 更新虚拟环境的pip版本
-python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -U pip
 
 # 在虚拟环境中安装依赖库
-python -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -r requirements.txt
 
 ~~~
 
 ### 启动
 
 ~~~
-python AlgorithmApiServer.py --port 9003
+python3 AlgorithmApiServer.py --port 9003
 
 ~~~
 

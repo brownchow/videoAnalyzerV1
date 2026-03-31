@@ -1,15 +1,21 @@
 #include "Core/Config.h"
 #include "Core/Scheduler.h"
 #include "Core/Server.h"
-#include <AVSAlgorithm.h>
+#include "../AVSAlgorithm/include/AVSAlgorithm.h"
 
 using namespace AVSAnalyzer;
 using namespace AVSAlgorithmLib;
 
+#include <clocale>
+
 int main(int argc, char** argv)
 {
+	// Set locale for proper character display
+	setlocale(LC_ALL, "");
 #ifdef WIN32
-	srand(time(NULL));//Ê±¼ä³õÊ¼»¯
+	srand(time(NULL));//æ—¶é—´åˆå§‹åŒ–
+#else
+	srand(time(NULL));//æ—¶é—´åˆå§‹åŒ–
 #endif // WIN32
 
 	const char* file = NULL;
@@ -26,12 +32,14 @@ int main(int argc, char** argv)
 		switch (argv[i][1])
 		{
 			case 'h': {
-				//´òÓ¡helpĞÅÏ¢
-				printf("-h ´òÓ¡²ÎÊıÅäÖÃĞÅÏ¢²¢ÍË³ö\n");
-				printf("-f ÅäÖÃÎÄ¼ş    Èç£º-f conf.json \n");
-				printf("-i api·şÎñIP   Èç£º-i 0.0.0.0 \n");
-				printf("-p api·şÎñ¶Ë¿Ú Èç£º-p 9002 \n");
-				system("pause\n"); 
+				// Help message
+				//æ‰“å°helpä¿¡æ¯
+				printf("-h æ‰“å°å‚æ•°é…ç½®ä¿¡æ¯å¹¶é€€å‡º\n");
+				printf("-f é…ç½®æ–‡ä»¶    å¦‚ï¼š-f conf.json \n");
+				printf("-i apiæœåŠ¡IP   å¦‚ï¼š-i 0.0.0.0 \n");
+				printf("-p apiæœåŠ¡ç«¯å£ å¦‚ï¼š-p 9002 \n");
+				// Removed Windows-specific pause command
+				// system("pause\n"); 
 				exit(0); 
 				return -1;
 			}

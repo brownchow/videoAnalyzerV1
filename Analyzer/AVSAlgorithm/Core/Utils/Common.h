@@ -1,10 +1,10 @@
-﻿#ifndef AVSALGORITHM_COMMON_H
+#ifndef AVSALGORITHM_COMMON_H
 #define AVSALGORITHM_COMMON_H
 
 #include <string>
 #include <vector>
 #include <chrono>
-#include <corecrt_io.h> // windows平台 access 函数
+#include <unistd.h>
 #include "Base64.h"
 #ifndef _DEBUG
 #include <turbojpeg.h>
@@ -16,30 +16,17 @@ namespace AVSAlgorithmLib {
 
     static int64_t getCurTime()// 获取当前系统启动以来的毫秒数
     {
-
-//#ifndef WIN32
-//        // Linux系统
-//        struct timespec now;// tv_sec (s) tv_nsec (ns-纳秒)
-//        clock_gettime(CLOCK_MONOTONIC, &now);
-//        return (now.tv_sec * 1000 + now.tv_nsec / 1000000);
-//#else
-//        //Win系统
-//        long long now = std::chrono::steady_clock::now().time_since_epoch().count();
-//        return now / 1000000;
-//#endif // !WIN32
-
-        long long now = std::chrono::steady_clock::now().time_since_epoch().count();
-        return now / 1000000;
-
+        // Linux系统
+        struct timespec now;// tv_sec (s) tv_nsec (ns-纳秒)
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        return (now.tv_sec * 1000 + now.tv_nsec / 1000000);
     }
     static int64_t getCurTimestamp()// 获取毫秒级时间戳（13位）
     {
         return std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).
             count();
-
     }
-
 
     static bool removeFile(const std::string& filename) {
 
@@ -53,7 +40,7 @@ namespace AVSAlgorithmLib {
 
     static void mkdirs(const std::string& dir) {
 
-        if (::_access(dir.data(), 0) != 0) {// 文件夹不存在
+        if (access(dir.data(), 0) != 0) {// 文件夹不存在
 
             std::string command;
             command = "mkdir -p " + dir;
@@ -62,9 +49,10 @@ namespace AVSAlgorithmLib {
         }
 
     }
+
     static bool __turboJpeg_compress(int height, int width, int channels, unsigned char* bgr, unsigned char*& out_data, unsigned long* out_size) {
 
-#ifndef _DEBUG
+    #ifndef _DEBUG
 
         tjhandle handle = tjInitCompress();
         if (nullptr == handle) {
@@ -84,16 +72,14 @@ namespace AVSAlgorithmLib {
             return false;
         }
         return true;
-#else
+    #else
         return false;
-#endif // !_DEBUG
-
+    #endif // !_DEBUG
     }
-
 
     static bool Common_CompressAndEncodeBase64(int height, int width,int channels, unsigned char* bgr, std::string& out_base64) {
 
-#ifndef _DEBUG
+    #ifndef _DEBUG
         unsigned char* jpeg_data = nullptr;
         unsigned long  jpeg_size = 0;
 
@@ -111,7 +97,7 @@ namespace AVSAlgorithmLib {
         else {
             return false;
         }
-#else 
+    #else 
 
         cv::Mat bgr_image(height, width, CV_8UC3, bgr);
 
@@ -123,10 +109,8 @@ namespace AVSAlgorithmLib {
 
         return true;
 
-#endif // !_DEBUG
-
+    #endif // !_DEBUG
     }
-
 
 };
 

@@ -16,5 +16,10 @@ zlm/www/*
 
 **/*.pyc
 
+Analyzer/make.log
+Analyzer/analyzer
+**/*.o
 
 Admin/Admin.sqlite3
+
+Algorithm/myenv

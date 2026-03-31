@@ -176,12 +176,12 @@ namespace AVSAnalyzer {
         auto f = mExecutorMap.find(control->code);
         if (mExecutorMap.end() != f) {
             ControlExecutor* executor = f->second;
-            // executor Ìí¼Óµ½´ıÉ¾³ı¶ÓÁĞstart
+            // executor æ·»åŠ åˆ°å¾…åˆ é™¤é˜Ÿåˆ—start
             std::unique_lock <std::mutex> lck(mTobeDeletedExecutorQ_mtx);
             mTobeDeletedExecutorQ.push(executor);
             //mTobeDeletedExecutorQ_cv.notify_all();
             mTobeDeletedExecutorQ_cv.notify_one();
-            // executor Ìí¼Óµ½´ıÉ¾³ı¶ÓÁĞend
+            // executor æ·»åŠ åˆ°å¾…åˆ é™¤é˜Ÿåˆ—end
             result = mExecutorMap.erase(control->code) != 0;
         }
         mExecutorMapMtx.unlock();
@@ -228,14 +228,11 @@ namespace AVSAnalyzer {
 
             ret = scheduler->getAlarm(alarm, alarmQSize);
             if (ret) {
-                LOGI("·¢ËÍ£¨1£©Ìõ±¨¾¯£¬Ê£Óà´ı±¨¾¯=%d,mAlarmImageInstanceCount=%d",
+                LOGI("å‘é€ï¼ˆ1ï¼‰æ¡æŠ¥è­¦ï¼Œå‰©ä½™å¾…æŠ¥è­¦=%d,mAlarmImageInstanceCount=%d",
                     alarmQSize, scheduler->mAlarmImageInstanceCount);
-
-
-                AVSAlarmManage_HandleAlarm(alarm,"","D:\\Project\\bxc\\BXC_VideoAnalyzer\\data","%Y/%m/%d-%H-%M");
-
-
-                //ÊÍ·ÅAlarmµÄÍ¼Æ¬×ÊÔ´
+                // å‘Šè­¦è§†é¢‘å†™å…¥è·¯å¾„
+                AVSAlarmManage_HandleAlarm(alarm, "", scheduler->mConfig->rootVideoDir.c_str(), "%Y/%m/%d-%H-%M");
+                //é‡Šæ”¾Alarmçš„å›¾ç‰‡èµ„æº
                 for (int i = 0; i < alarm->images.size(); i++)
                 {
                     AVSAlarmImage* image = alarm->images[i];

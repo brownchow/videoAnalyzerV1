@@ -3,11 +3,8 @@
 #include <string>
 #include <vector>
 
-#ifdef AVSALGORITHM_EXPORTS
-#define __DECLSPEC_INC __declspec(dllexport)
-#else
-#define __DECLSPEC_INC __declspec(dllimport)
-#endif // !AVSALGORITHM_EXPORTS
+// Linux doesn't need __declspec
+#define __DECLSPEC_INC
 
 #define ALGORITHMTYPE_PY "py"
 #define ALGORITHMTYPE_API "api"
@@ -23,7 +20,7 @@ namespace AVSAlgorithmLib {
         std::string algorithmPath;
         std::string algorithmDevice;
         int algorithmInstanceNum = 1;
-        std::vector<std::string> algorithmApiHosts;// 算法服务地址数组
+        std::vector<std::string> algorithmApiHosts;// 绠楁硶鏈嶅姟鍦板潃鏁扮粍
     };
 
     struct AlgorithmDetectObject

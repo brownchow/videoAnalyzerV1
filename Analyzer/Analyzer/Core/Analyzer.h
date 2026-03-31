@@ -2,7 +2,7 @@
 #define ANALYZER_ANALYZER_H
 
 #include <vector>
-#include <AVSAlgorithm.h>
+#include "../../AVSAlgorithm/include/AVSAlgorithm.h"
 using namespace AVSAlgorithmLib;
 namespace AVSAnalyzer {
 #define PLAY 0
@@ -24,8 +24,8 @@ namespace AVSAnalyzer {
 		bool checkVideoFrame(bool check, int64_t frameCount, unsigned char* data, float& happenScore);
 		bool checkAudioFrame(bool check, int64_t frameCount, unsigned char* data, int size);
 
-		void SDLShow(unsigned char* data);// ÏÔÊ¾bgrµÄÍ¼Æ¬
-		void SDLShow(int linesize[8], unsigned char* data[8]);// ÏÔÊ¾yuvµÄÍ¼Æ¬
+			void SDLShow(unsigned char* data);// æ˜¾ç¤ºbgrçš„å›¾ç‰‡
+		void SDLShow(int linesize[8], unsigned char* data[8]);// æ˜¾ç¤ºyuvçš„å›¾ç‰‡
 
 	private:
 		int initSDL();
@@ -38,12 +38,12 @@ namespace AVSAnalyzer {
 		std::vector<AlgorithmDetectObject> mDetects;
 
 #if PLAY
-		SDL_Window* mSDLWindow{}; // ´°¿Ú
-		SDL_Renderer* mSDLRenderer{};// äÖÈ¾Æ÷
-		SDL_Texture* mSDLTexture_IYUV{}; // yuvÎÆÀí
-		SDL_Texture* mSDLTexture_BGR24{}; // bgrÎÆÀí
-		SDL_Event mSDLEvent{};// ¼àÌıÊÂ¼ş
-		SDL_Rect  mSDLRect{}; // ¾ØĞÎÇøÓò
+		SDL_Window* mSDLWindow{}; // çª—å£
+		SDL_Renderer* mSDLRenderer{};// æ¸²æŸ“å™¨
+		SDL_Texture* mSDLTexture_IYUV{}; // yuvçº¹ç†
+		SDL_Texture* mSDLTexture_BGR24{}; // bgrçº¹ç†
+		SDL_Event mSDLEvent{};// ç›‘å¬äº‹ä»¶
+		SDL_Rect  mSDLRect{}; // çŸ©å½¢åŒºåŸŸ
 #endif // PLAY
 
 

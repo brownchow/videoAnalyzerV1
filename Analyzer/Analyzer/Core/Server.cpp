@@ -1,51 +1,38 @@
 #include "Server.h"
-#pragma comment(lib, "ws2_32.lib")
-#include <WinSock2.h>
-#include <WS2tcpip.h>
 #include <event2/event.h>
 #include <event2/http.h>
 #include <event2/buffer.h>
 #include <event2/http_struct.h>
-#include <json/json.h>
-#include <json/value.h>
+#include <jsoncpp/json/json.h>
+#include <jsoncpp/json/value.h>
 #include <thread>
 #include "Control.h"
 #include "Config.h"
 #include "Scheduler.h"
 #include "Utils/Log.h"
 #include "Utils/Common.h"
+#include <iostream>
+#include <cstring>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 using namespace AVSAnalyzer;
+using Json::Value;
+using Json::CharReaderBuilder;
+using Json::CharReader;
 
 #define RECV_BUF_MAX_SIZE 1024*8
 
 
 Server::Server() {
-
-    WSADATA wdSockMsg;
-    int s = WSAStartup(MAKEWORD(2, 2), &wdSockMsg);
-
-    if (0 != s)
-    {
-        switch (s)
-        {
-        case WSASYSNOTREADY: printf("÷ÿ∆ÙµÁƒ‘£¨ªÚ’ﬂºÏ≤ÈÕ¯¬Áø‚");   break;
-        case WSAVERNOTSUPPORTED: printf("«Î∏¸–¬Õ¯¬Áø‚");  break;
-        case WSAEINPROGRESS: printf("«Î÷ÿ–¬∆Ù∂Ø");  break;
-        case WSAEPROCLIM:  printf("«Îπÿ±’≤ª±ÿ“™µƒ»Ìº˛£¨“‘»∑±£”–◊„πªµƒÕ¯¬Á◊ ‘¥"); break;
-        }
-    }
-
-    if (2 != HIBYTE(wdSockMsg.wVersion) || 2 != LOBYTE(wdSockMsg.wVersion))
-    {
-        LOGE("Õ¯¬Áø‚∞Ê±æ¥ÌŒÛ");
-        return;
-    }
-
+    // No Windows socket initialization needed on Linux
 }
+
 Server::~Server() {
     LOGE("");
-    WSACleanup();
+    // No Windows socket cleanup needed on Linux
 }
 
 void Server::start(void* arg) {
@@ -60,7 +47,7 @@ void Server::start(void* arg) {
         evhttp_set_default_content_type(http, "text/html; charset=utf-8");
 
         evhttp_set_timeout(http, 30);
-        // …Ë÷√¬∑”…
+        // ËÆæÁΩÆË∑ØÁî±
         evhttp_set_cb(http, "/", api_index, nullptr);
         evhttp_set_cb(http, "/api/health", api_health, scheduler);
         evhttp_set_cb(http, "/api/controls", api_controls, scheduler);
@@ -78,7 +65,6 @@ void Server::start(void* arg) {
         scheduler->setState(false);
 
     }, scheduler).detach();
-
 }
 
 void api_index(struct evhttp_request* req, void* arg) {
@@ -91,7 +77,7 @@ void api_index(struct evhttp_request* req, void* arg) {
     result_urls["/api/control/add"] = "add control";
     result_urls["/api/control/cancel"] = "cancel control";
     
-    
+
     Json::Value result;
     result["urls"] = result_urls;
 
@@ -99,13 +85,13 @@ void api_index(struct evhttp_request* req, void* arg) {
     evbuffer_add_printf(buff, "%s", result.toStyledString().c_str());
     evhttp_send_reply(req, HTTP_OK, nullptr, buff);
     evbuffer_free(buff);
-
 }
+
 void api_health(struct evhttp_request* req, void* arg) {
     int result_code = 0;
     std::string result_msg = "error";
 
-    // Ω°øµºÏ≤‚
+    // ÂÅ•Â∫∑Ê£ÄÊµã
     result_code = 1000;
     result_msg = "current service health";
 
@@ -118,11 +104,10 @@ void api_health(struct evhttp_request* req, void* arg) {
     evbuffer_add_printf(buff, "%s", result.toStyledString().c_str());
     evhttp_send_reply(req, HTTP_OK, nullptr, buff);
     evbuffer_free(buff);
-
 }
+
 void api_controls(struct evhttp_request* req, void* arg) {
     
-
     Scheduler* scheduler = (Scheduler*)arg;
     char buf[RECV_BUF_MAX_SIZE];
     parse_post(req, buf);
@@ -161,6 +146,7 @@ void api_controls(struct evhttp_request* req, void* arg) {
                 result_data_item["liveMilliseconds"] = curTimestamp - executorStartTimestamp;
 
 
+
                 result_data.append(result_data_item);
             }
             result["data"] = result_data;
@@ -171,7 +157,6 @@ void api_controls(struct evhttp_request* req, void* arg) {
             result_msg = "the number of control exector is empty";
         }
 
-
     }
     else {
         result_msg = "invalid request parameter";
@@ -181,13 +166,12 @@ void api_controls(struct evhttp_request* req, void* arg) {
 
     //LOGI("\n \t request:%s \n \t response:%s", root.toStyledString().data(), result.toStyledString().data());
 
-
     struct evbuffer* buff = evbuffer_new();
     evbuffer_add_printf(buff, "%s", result.toStyledString().c_str());
     evhttp_send_reply(req, HTTP_OK, nullptr, buff);
     evbuffer_free(buff);
-
 }
+
 void api_control(struct evhttp_request* req, void* arg) {
 
     Scheduler* scheduler = (Scheduler*)arg;
@@ -240,10 +224,9 @@ void api_control(struct evhttp_request* req, void* arg) {
     evbuffer_add_printf(buff, "%s", result.toStyledString().c_str());
     evhttp_send_reply(req, HTTP_OK, nullptr, buff);
     evbuffer_free(buff);
-
 }
-void api_control_add(struct evhttp_request* req, void* arg) {
 
+void api_control_add(struct evhttp_request* req, void* arg) {
 
     Scheduler* scheduler = (Scheduler*)arg;
     char buf[RECV_BUF_MAX_SIZE];
@@ -295,11 +278,9 @@ void api_control_add(struct evhttp_request* req, void* arg) {
     evbuffer_add_printf(buff, "%s", result.toStyledString().c_str());
     evhttp_send_reply(req, HTTP_OK, nullptr, buff);
     evbuffer_free(buff);
-
-
 }
-void api_control_cancel(struct evhttp_request* req, void* arg) {
 
+void api_control_cancel(struct evhttp_request* req, void* arg) {
 
     Scheduler* scheduler = (Scheduler*)arg;
     char buf[RECV_BUF_MAX_SIZE];
@@ -307,7 +288,6 @@ void api_control_cancel(struct evhttp_request* req, void* arg) {
 
     Json::CharReaderBuilder builder;
     const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
-
     Json::Value root;
     JSONCPP_STRING errs;
 
@@ -324,7 +304,6 @@ void api_control_cancel(struct evhttp_request* req, void* arg) {
         if (control.validateCancel(result_msg)) {
             scheduler->apiControlCancel(&control, result_code, result_msg);
         }
-
     }
     else {
         result_msg = "invalid request parameter";
@@ -340,9 +319,8 @@ void api_control_cancel(struct evhttp_request* req, void* arg) {
     evbuffer_add_printf(buff, "%s", result.toStyledString().c_str());
     evhttp_send_reply(req, HTTP_OK, nullptr, buff);
     evbuffer_free(buff);
-
-
 }
+
 void parse_get(struct evhttp_request* req, struct evkeyvalq* params) {
     if (req == nullptr) {
         return;
@@ -381,5 +359,4 @@ void parse_post(struct evhttp_request* req, char* buf) {
         buf[post_size] = '\0';
         //        printf("====line:%d,post msg:%s\n",__LINE__,buf);
     }
-
 }

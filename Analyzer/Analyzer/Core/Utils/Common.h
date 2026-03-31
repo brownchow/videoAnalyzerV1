@@ -4,22 +4,15 @@
 #include <string>
 #include <vector>
 #include <chrono>
-
-#include <corecrt_io.h> // windows平台 access 函数
+#include <unistd.h>
 
 namespace AVSAnalyzer {
     static int64_t Analyzer_getCurTime()// 获取当前系统启动以来的毫秒数
     {
-#ifndef WIN32
         // Linux系统
         struct timespec now;// tv_sec (s) tv_nsec (ns-纳秒)
         clock_gettime(CLOCK_MONOTONIC, &now);
         return (now.tv_sec * 1000 + now.tv_nsec / 1000000);
-#else
-        long long now = std::chrono::steady_clock::now().time_since_epoch().count();
-        return now / 1000000;
-#endif // !WIN32
-
     }
     static int64_t Analyzer_getCurTimestamp()// 获取毫秒级时间戳（13位）
     {
@@ -62,7 +55,7 @@ namespace AVSAnalyzer {
 
     static void Analyzer_mkdirs(const std::string& dir) {
 
-        if (::_access(dir.data(), 0) != 0) {// 文件夹不存在
+        if (access(dir.data(), 0) != 0) {// 文件夹不存在
 
             std::string command;
             command = "mkdir -p " + dir;
@@ -72,7 +65,5 @@ namespace AVSAnalyzer {
 
     }
 
-
 };
-
 #endif //ANALYZER_COMMON_H
