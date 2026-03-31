@@ -63,16 +63,16 @@ int main(int argc, char** argv)
 		}
 	}
 
-	// If no config file specified, default to conf.json in current directory
+	// 如果未指定配置文件，默认加载当前目录下的 config.json
 	if (file == NULL) {
-		file = "conf.json";
+		file = "config.json";
 	}
 
 
 	Config config(file,ip,port);
 	if (!config.mState) {
-		printf("failed to read config file: %s\n", file);
-		printf("Please ensure the config file exists or specify a valid config file using -f parameter\n");
+		printf("[错误] 读取配置文件失败: %s\n", file);
+		printf("请确保当前目录下存在 config.json，或使用 -f 参数指定有效的配置文件\n");
 		return -1;
 	}
 
