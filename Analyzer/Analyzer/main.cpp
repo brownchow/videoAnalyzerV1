@@ -72,6 +72,7 @@ int main(int argc, char** argv)
 	Config config(file,ip,port);
 	if (!config.mState) {
 		printf("failed to read config file: %s\n", file);
+		printf("Please ensure the config file exists or specify a valid config file using -f parameter\n");
 		return -1;
 	}
 
