@@ -63,6 +63,11 @@ int main(int argc, char** argv)
 		}
 	}
 
+	// If no config file specified, default to conf.json in current directory
+	if (file == NULL) {
+		file = "conf.json";
+	}
+
 
 	Config config(file,ip,port);
 	if (!config.mState) {
