@@ -11,9 +11,15 @@
 #include "../../AVSAlarmManage/include/AVSAlarmManage.h"
 using namespace AVSAlarmManageLib;
 
+/**
+ * 
+ */
 namespace AVSAnalyzer {
+
     class Config;
+    
     class ControlExecutor;
+    
     struct Control;
 
     /**
@@ -120,7 +126,7 @@ namespace AVSAnalyzer {
         // 调度器状态
         bool mState;
 
-        // 控制执行器映射表 <控制码, 控制执行器指针>
+        // 控制执行器映射表 key:value <控制码, 控制执行器指针>
         std::map<std::string, ControlExecutor*> mExecutorMap;
         std::mutex                              mExecutorMapMtx;
         

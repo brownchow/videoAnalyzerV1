@@ -66,7 +66,6 @@ namespace AVSAnalyzer {
      */
     int Scheduler::apiControls(std::vector<Control*>& controls) {
         int len = 0;
-
         mExecutorMapMtx.lock();
         for (auto f = mExecutorMap.begin(); f != mExecutorMap.end(); ++f)
         {
@@ -106,7 +105,7 @@ namespace AVSAnalyzer {
     void Scheduler::apiControlAdd(Control* control, int& result_code, std::string& result_msg) {
         // 检查控制是否已存在
         if (isAdd(control)) {
-            result_msg = "the control is running";
+            result_msg = "部控器正在运行.....";
             result_code = 1000;
             return;
         }
@@ -119,7 +118,6 @@ namespace AVSAnalyzer {
         else {
             // 创建控制执行器
             ControlExecutor* executor = new ControlExecutor(this, control);
-
             // 启动执行器
             if (executor->start(result_msg)) {
                 // 添加到执行器映射表
@@ -226,7 +224,6 @@ namespace AVSAnalyzer {
      */
     bool Scheduler::addExecutor(Control* control, ControlExecutor* controlExecutor) {
         bool add = false;
-
         mExecutorMapMtx.lock();
         if (mExecutorMap.size() < mConfig->controlExecutorMaxNum) {
             // 检查是否已存在
@@ -320,12 +317,9 @@ namespace AVSAnalyzer {
             // 获取报警
             ret = scheduler->getAlarm(alarm, alarmQSize);
             if (ret) {
-                LOGI("发送（1）条报警，剩余待报警=%d,mAlarmImageInstanceCount=%d",
-                    alarmQSize, scheduler->mAlarmImageInstanceCount);
-                
+                LOGI("发送（1）条报警，剩余待报警=%d,mAlarmImageInstanceCount=%d", alarmQSize, scheduler->mAlarmImageInstanceCount);
                 // 处理报警
                 AVSAlarmManage_HandleAlarm(alarm, "", scheduler->mConfig->rootVideoDir.c_str(), "%Y/%m/%d-%H-%M");
-                
                 // 释放Alarm的图片资源
                 for (int i = 0; i < alarm->images.size(); i++)
                 {

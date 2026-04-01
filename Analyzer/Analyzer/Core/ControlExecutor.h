@@ -139,16 +139,46 @@ namespace AVSAnalyzer {
         void setState_remove();
 
     public:
-        Control* mControl;           // 控制对象
-        Scheduler* mScheduler;       // 调度器
-        AvPullStream* mPullStream;   // 拉流对象
-        AvPushStream* mPushStream;   // 推流对象
-        GenerateAlarm* mGenerateAlarm; // 报警生成器
-        Analyzer* mAnalyzer;         // 分析器
+        /**
+         * 控制对象
+         */
+        Control* mControl;    
+        
+        /**
+         * 调度器
+         */
+        Scheduler* mScheduler;
+
+        /**
+         * 拉流对象
+         */
+        AvPullStream* mPullStream;
+
+        /**
+         * 推流对象
+         */
+        AvPushStream* mPushStream;
+
+        /**
+         * 报警生成器
+         */
+        GenerateAlarm* mGenerateAlarm;
+
+        /**
+         * 分析器
+         */
+        Analyzer* mAnalyzer;        
 
     private:
-        bool mState = false;         // 执行器状态
-        std::vector<std::thread*> mThreads; // 线程列表
+        /**
+         * 执行器状态
+         */
+        bool mState = false;
+
+        /**
+         * 线程列表
+         */
+        std::vector<std::thread*> mThreads;
     };
 }
 
