@@ -25,7 +25,10 @@ using Json::CharReader;
 
 #define RECV_BUF_MAX_SIZE 1024*8
 
-
+/**
+ * Server 类
+ * 功能：实现 HTTP 服务器，处理 API 请求
+ */
 Server::Server() {
     // No Windows socket initialization needed on Linux
 }
@@ -35,12 +38,15 @@ Server::~Server() {
     // No Windows socket cleanup needed on Linux
 }
 
+/**
+ * 启动服务器
+ * @param arg 调度器指针
+ */
 void Server::start(void* arg) {
     Scheduler* scheduler = (Scheduler*)arg;
     scheduler->setState(true);
 
     std::thread([](Scheduler *scheduler) {
-        
         event_config* evt_config = event_config_new();
         struct event_base* base = event_base_new_with_config(evt_config);
         struct evhttp* http = evhttp_new(base);
@@ -55,8 +61,7 @@ void Server::start(void* arg) {
         evhttp_set_cb(http, "/api/control/add", api_control_add, scheduler);
         evhttp_set_cb(http, "/api/control/cancel", api_control_cancel, scheduler);
 
-        evhttp_bind_socket(http, scheduler->getConfig()->serverIp,
-            scheduler->getConfig()->serverPort);
+        evhttp_bind_socket(http, scheduler->getConfig()->serverIp, scheduler->getConfig()->serverPort);
         event_base_dispatch(base);
         event_base_free(base);
         evhttp_free(http);
@@ -67,8 +72,12 @@ void Server::start(void* arg) {
     }, scheduler).detach();
 }
 
+/**
+ * 处理根路径请求
+ * @param req HTTP 请求
+ * @param arg 附加参数
+ */
 void api_index(struct evhttp_request* req, void* arg) {
-   
     Json::Value result_urls;
     result_urls["/api"] = "this api version 1.0";
     result_urls["/api/health"] = "check health";
@@ -76,7 +85,6 @@ void api_index(struct evhttp_request* req, void* arg) {
     result_urls["/api/control"] = "get control being analyzed";
     result_urls["/api/control/add"] = "add control";
     result_urls["/api/control/cancel"] = "cancel control";
-    
 
     Json::Value result;
     result["urls"] = result_urls;
@@ -87,6 +95,11 @@ void api_index(struct evhttp_request* req, void* arg) {
     evbuffer_free(buff);
 }
 
+/**
+ * 健康检查接口
+ * @param req HTTP 请求
+ * @param arg 附加参数（调度器指针）
+ */
 void api_health(struct evhttp_request* req, void* arg) {
     int result_code = 0;
     std::string result_msg = "error";
@@ -94,7 +107,6 @@ void api_health(struct evhttp_request* req, void* arg) {
     // 健康检测
     result_code = 1000;
     result_msg = "current service health";
-
 
     Json::Value result;
     result["msg"] = result_msg;
@@ -106,8 +118,12 @@ void api_health(struct evhttp_request* req, void* arg) {
     evbuffer_free(buff);
 }
 
+/**
+ * 获取所有控制执行器接口
+ * @param req HTTP 请求
+ * @param arg 附加参数（调度器指针）
+ */
 void api_controls(struct evhttp_request* req, void* arg) {
-    
     Scheduler* scheduler = (Scheduler*)arg;
     char buf[RECV_BUF_MAX_SIZE];
     parse_post(req, buf);
@@ -117,7 +133,6 @@ void api_controls(struct evhttp_request* req, void* arg) {
     Json::Value root;
     JSONCPP_STRING errs;
 
-
     Json::Value result_data;
     Json::Value result_data_item;
     int result_code = 0;
@@ -125,15 +140,13 @@ void api_controls(struct evhttp_request* req, void* arg) {
     Json::Value result;
 
     if (reader->parse(buf, buf + std::strlen(buf), &root, &errs) && errs.empty()) {
-
         std::vector<Control*> controls;
         int len = scheduler->apiControls(controls);
 
         if (len > 0) {
             int64_t curTimestamp = Analyzer_getCurTimestamp();
             int64_t executorStartTimestamp = 0;
-            for (int i = 0; i < controls.size(); i++)
-            {
+            for (int i = 0; i < controls.size(); i++) {
                 executorStartTimestamp = controls[i]->executorStartTimestamp;
 
                 result_data_item["code"] = controls[i]->code.data();
@@ -145,20 +158,16 @@ void api_controls(struct evhttp_request* req, void* arg) {
                 result_data_item["executorStartTimestamp"] = executorStartTimestamp;
                 result_data_item["liveMilliseconds"] = curTimestamp - executorStartTimestamp;
 
-
-
                 result_data.append(result_data_item);
             }
             result["data"] = result_data;
             result_code = 1000;
             result_msg = "success";
-        }
-        else {
+        } else {
             result_msg = "the number of control exector is empty";
         }
 
-    }
-    else {
+    } else {
         result_msg = "invalid request parameter";
     }
     result["msg"] = result_msg;
@@ -172,8 +181,12 @@ void api_controls(struct evhttp_request* req, void* arg) {
     evbuffer_free(buff);
 }
 
+/**
+ * 获取单个控制执行器接口
+ * @param req HTTP 请求
+ * @param arg 附加参数（调度器指针）
+ */
 void api_control(struct evhttp_request* req, void* arg) {
-
     Scheduler* scheduler = (Scheduler*)arg;
     char buf[RECV_BUF_MAX_SIZE];
     parse_post(req, buf);
@@ -186,10 +199,8 @@ void api_control(struct evhttp_request* req, void* arg) {
     Json::Value result_control;
     int result_code = 0;
     std::string result_msg = "error";
-    
 
     if (reader->parse(buf, buf + std::strlen(buf), &root, &errs) && errs.empty()) {
-
         Control* control = NULL;
         if (root["code"].isString()) {
             std::string code = root["code"].asCString();
@@ -203,12 +214,10 @@ void api_control(struct evhttp_request* req, void* arg) {
             result_code = 1000;
             result_msg = "success";
 
-        }
-        else {
+        } else {
             result_msg = "the control does not exist";
         }
-    }
-    else {
+    } else {
         result_msg = "invalid request parameter";
     }
 
@@ -219,15 +228,18 @@ void api_control(struct evhttp_request* req, void* arg) {
 
     LOGI("\n \t request:%s \n \t response:%s", root.toStyledString().data(), result.toStyledString().data());
 
-
     struct evbuffer* buff = evbuffer_new();
     evbuffer_add_printf(buff, "%s", result.toStyledString().c_str());
     evhttp_send_reply(req, HTTP_OK, nullptr, buff);
     evbuffer_free(buff);
 }
 
+/**
+ * 添加控制执行器接口
+ * @param req HTTP 请求
+ * @param arg 附加参数（调度器指针）
+ */
 void api_control_add(struct evhttp_request* req, void* arg) {
-
     Scheduler* scheduler = (Scheduler*)arg;
     char buf[RECV_BUF_MAX_SIZE];
     parse_post(req, buf);
@@ -240,9 +252,7 @@ void api_control_add(struct evhttp_request* req, void* arg) {
     int result_code = 0;
     std::string result_msg = "error";
 
-
     if (reader->parse(buf, buf + std::strlen(buf), &root, &errs) && errs.empty()) {
-
         Control control;
 
         if (root["code"].isString()) {
@@ -263,8 +273,7 @@ void api_control_add(struct evhttp_request* req, void* arg) {
         if (control.validateAdd(result_msg)) {
             scheduler->apiControlAdd(&control, result_code, result_msg);
         }
-    }
-    else {
+    } else {
         result_msg = "invalid request parameter";
     }
 
@@ -280,8 +289,12 @@ void api_control_add(struct evhttp_request* req, void* arg) {
     evbuffer_free(buff);
 }
 
+/**
+ * 取消控制执行器接口
+ * @param req HTTP 请求
+ * @param arg 附加参数（调度器指针）
+ */
 void api_control_cancel(struct evhttp_request* req, void* arg) {
-
     Scheduler* scheduler = (Scheduler*)arg;
     char buf[RECV_BUF_MAX_SIZE];
     parse_post(req, buf);
@@ -295,7 +308,6 @@ void api_control_cancel(struct evhttp_request* req, void* arg) {
     std::string result_msg = "error";
 
     if (reader->parse(buf, buf + std::strlen(buf), &root, &errs) && errs.empty()) {
-
         Control control;
 
         if (root["code"].isString()) {
@@ -304,8 +316,7 @@ void api_control_cancel(struct evhttp_request* req, void* arg) {
         if (control.validateCancel(result_msg)) {
             scheduler->apiControlCancel(&control, result_code, result_msg);
         }
-    }
-    else {
+    } else {
         result_msg = "invalid request parameter";
     }
 
@@ -321,6 +332,11 @@ void api_control_cancel(struct evhttp_request* req, void* arg) {
     evbuffer_free(buff);
 }
 
+/**
+ * 解析 GET 请求参数
+ * @param req HTTP 请求
+ * @param params 参数存储结构
+ */
 void parse_get(struct evhttp_request* req, struct evkeyvalq* params) {
     if (req == nullptr) {
         return;
@@ -343,6 +359,12 @@ void parse_get(struct evhttp_request* req, struct evkeyvalq* params) {
     }
     evhttp_parse_query_str(query, params);
 }
+
+/**
+ * 解析 POST 请求参数
+ * @param req HTTP 请求
+ * @param buf 存储参数的缓冲区
+ */
 void parse_post(struct evhttp_request* req, char* buf) {
     size_t post_size = 0;
 
@@ -351,8 +373,7 @@ void parse_post(struct evhttp_request* req, char* buf) {
         //        printf("====line:%d,post msg is empty!\n",__LINE__);
         return;
 
-    }
-    else {
+    } else {
         size_t copy_len = post_size > RECV_BUF_MAX_SIZE ? RECV_BUF_MAX_SIZE : post_size;
         //        printf("====line:%d,post len:%d, copy_len:%d\n",__LINE__,post_size,copy_len);
         memcpy(buf, evbuffer_pullup(req->input_buffer, -1), copy_len);
