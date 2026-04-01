@@ -283,6 +283,9 @@ namespace AVSAlarmManageLib {
         frame_yuv420p = nullptr;
 
         return true;
+    }
+
 }
+
 
 
