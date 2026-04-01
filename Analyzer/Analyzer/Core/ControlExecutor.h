@@ -171,7 +171,7 @@ namespace AVSAnalyzer {
 
     private:
         /**
-         * 执行器状态
+         * 执行器状态，true 正在运行，false 未运行
          */
         bool mState = false;
 

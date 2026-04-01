@@ -21,10 +21,8 @@ namespace AVSAnalyzer {
     Scheduler::~Scheduler()
     {
         LOGI("");
-
         // 清空报警队列
         clearAlarmQueue();
-        
         // 等待报警线程结束
         mLoopAlarmThread->join();
         delete mLoopAlarmThread;
@@ -44,11 +42,9 @@ namespace AVSAnalyzer {
      */
     void Scheduler::loop() {
         LOGI("Loop Start");
-
         // 创建并启动报警循环线程
         mLoopAlarmThread = new std::thread(Scheduler::loopAlarmThread, this);
         mLoopAlarmThread->native_handle();
-
         int64_t l = 0;
         while (mState)
         {
@@ -73,7 +69,6 @@ namespace AVSAnalyzer {
             controls.push_back(f->second->mControl);
         }
         mExecutorMapMtx.unlock();
-
         return len;
     }
 
@@ -92,7 +87,6 @@ namespace AVSAnalyzer {
             }
         }
         mExecutorMapMtx.unlock();
-
         return control;
     }
 
@@ -109,7 +103,6 @@ namespace AVSAnalyzer {
             result_code = 1000;
             return;
         }
-
         // 检查执行器数量是否超过限制
         if (getExecutorMapSize() >= mConfig->controlExecutorMaxNum) {
             result_msg = "the number of control exceeds the limit";
@@ -151,7 +144,6 @@ namespace AVSAnalyzer {
     void Scheduler::apiControlCancel(Control* control, int& result_code, std::string& result_msg) {
         // 获取控制执行器
         ControlExecutor* controlExecutor = getExecutor(control);
-
         if (controlExecutor) {
             // 检查执行器状态
             if (controlExecutor->getState()) {
@@ -160,10 +152,8 @@ namespace AVSAnalyzer {
             else {
                 result_msg = "control is not running, ";
             }
-
             // 移除执行器
             removeExecutor(control);
-
             result_msg += "remove success";
             result_code = 1000;
             return;
@@ -249,13 +239,11 @@ namespace AVSAnalyzer {
         mExecutorMapMtx.lock();
         auto f = mExecutorMap.find(control->code);
         if (mExecutorMap.end() != f) {
-            ControlExecutor* executor = f->second;
-            
+            ControlExecutor* executor = f->second;   
             // 添加到待删除队列
             std::unique_lock <std::mutex> lck(mTobeDeletedExecutorQ_mtx);
             mTobeDeletedExecutorQ.push(executor);
             mTobeDeletedExecutorQ_cv.notify_one();
-            
             // 从映射表中删除
             result = mExecutorMap.erase(control->code) != 0;
         }
@@ -270,7 +258,6 @@ namespace AVSAnalyzer {
      */
     ControlExecutor* Scheduler::getExecutor(Control* control) {
         ControlExecutor* executor = nullptr;
-
         mExecutorMapMtx.lock();
         auto f = mExecutorMap.find(control->code);
         if (mExecutorMap.end() != f) {
@@ -286,14 +273,11 @@ namespace AVSAnalyzer {
     void Scheduler::handleDeleteExecutor() {
         std::unique_lock <std::mutex> lck(mTobeDeletedExecutorQ_mtx);
         mTobeDeletedExecutorQ_cv.wait(lck);
-
         // 处理所有待删除的执行器
         while (!mTobeDeletedExecutorQ.empty()) {
             ControlExecutor* executor = mTobeDeletedExecutorQ.front();
             mTobeDeletedExecutorQ.pop();
-
             LOGI("code=%s,streamUrl=%s", executor->mControl->code.data(), executor->mControl->streamUrl.data());
-
             // 释放执行器
             delete executor;
             executor = nullptr;
@@ -313,7 +297,6 @@ namespace AVSAnalyzer {
         while (true) {
             // 每1秒检查一次报警队列
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
             // 获取报警
             ret = scheduler->getAlarm(alarm, alarmQSize);
             if (ret) {
@@ -329,7 +312,6 @@ namespace AVSAnalyzer {
                     }
                 }
                 alarm->images.clear();
-
                 // 释放报警对象
                 delete alarm;
                 alarm = nullptr;
@@ -338,7 +320,7 @@ namespace AVSAnalyzer {
     }
 
     /**
-     * 添加报警
+     * 添加报警，将告警对象添加到队列
      * @param alarm 报警对象指针
      */
     void Scheduler::addAlarm(AVSAlarm* alarm) {
@@ -354,7 +336,6 @@ namespace AVSAnalyzer {
     AVSAlarmImage* Scheduler::gainAlarmImage() {
         AVSAlarmImage* image = nullptr;
         mAlarmImageQ_mtx.lock();
-
         if (mAlarmImageQ.empty()) {
             mAlarmImageQ_mtx.unlock();
             // 队列为空，创建新实例
@@ -367,7 +348,6 @@ namespace AVSAnalyzer {
             mAlarmImageQ.pop();
             mAlarmImageQ_mtx.unlock();
         }
-
         return image;
     }
 
@@ -378,7 +358,6 @@ namespace AVSAnalyzer {
     void Scheduler::giveBackAlarmImage(AVSAlarmImage* image) {
         // 释放图片数据
         image->freeData();
-
         // 归还到队列
         mAlarmImageQ_mtx.lock();
         mAlarmImageQ.push(image);
@@ -386,14 +365,13 @@ namespace AVSAnalyzer {
     }
 
     /**
-     * 获取报警
+     * 获取报警，从队列中获取对应告警对象
      * @param alarm 报警对象指针引用
      * @param alarmQSize 报警队列大小
      * @return 是否获取成功
      */
     bool Scheduler::getAlarm(AVSAlarm*& alarm, int& alarmQSize) {
         mAlarmQ_mtx.lock();
-
         if (!mAlarmQ.empty()) {
             // 从队列中获取报警
             alarm = mAlarmQ.front();

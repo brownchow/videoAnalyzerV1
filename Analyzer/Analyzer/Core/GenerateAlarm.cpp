@@ -50,7 +50,6 @@ namespace AVSAnalyzer {
         mVideoFrameQ_mtx.lock();
         mVideoFrameQ.push(frame);
         mVideoFrameQ_mtx.unlock();
-
     }
 
     /**
@@ -92,7 +91,7 @@ namespace AVSAnalyzer {
     }
 
     /**
-     * 生成报警线程
+     * 生成报警线程，重点！
      * @param arg 线程参数
      */
     void GenerateAlarm::generateAlarmThread(void* arg) {
@@ -118,13 +117,10 @@ namespace AVSAnalyzer {
         while (executor->getState()) {
             if (executor->mGenerateAlarm->getVideoFrame(videoFrame, videoFrameQSize)) {
                 t1 = Analyzer_getCurTime();
-
-                // 获取报警图片对象
+                // 获取报警图片对象，从队列里拿一个图片
                 AVSAlarmImage* image = executor->mScheduler->gainAlarmImage();
-
                 // 压缩图片
                 bool comp = AVSAlarmManage_CompressImage(height, width, channels, videoFrame->data, image);
-
                 if (comp) {
                     image->happen = videoFrame->happen;
                     image->happenScore = videoFrame->happenScore;
@@ -140,10 +136,8 @@ namespace AVSAnalyzer {
                     } else {
                         executor->mScheduler->giveBackAlarmImage(image);
                     }
-
                     if (happenV.size() >= happenV_alarm_max_size) {
                         last_alarm_timestamp = Analyzer_getCurTimestamp();
-
                         // 创建报警对象
                         AVSAlarm* alarm = AVSAlarm::Create(
                             height,
@@ -152,7 +146,6 @@ namespace AVSAnalyzer {
                             last_alarm_timestamp,
                             executor->mControl->code.data()
                         );
-
                         // 添加图片到报警对象
                         for (size_t i = 0; i < happenV.size(); i++) {
                             alarm->images.push_back(happenV[i]);
@@ -170,9 +163,7 @@ namespace AVSAnalyzer {
                 } else { // 暂未发生报警事件
                     if (comp) {
                         cacheV.push_back(image);
-
                         // LOGI("cache h=%d,w=%d,compressSize=%d,compress spend: %lld(ms),cacheQ.size=%lld",height, width, compressImage.getSize(), (t2 - t1), cacheV.size());
-
                         if (!cacheV.empty() && cacheV.size() > cacheV_max_size) {
                             // 满足缓存过期帧
                             auto b = cacheV.begin();
@@ -188,14 +179,12 @@ namespace AVSAnalyzer {
                             happenV = cacheV;
                             cacheV.clear();
                         }
-
                     } else {
                         executor->mScheduler->giveBackAlarmImage(image);
                     }
                     delete videoFrame;
                     videoFrame = nullptr;
                 }
-
             } else {
                 std::this_thread::sleep_for(std::chrono::milliseconds(2));
             }

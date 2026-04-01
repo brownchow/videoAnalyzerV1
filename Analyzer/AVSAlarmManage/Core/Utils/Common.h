@@ -16,20 +16,31 @@
 
 namespace AVSAlarmManageLib {
 
-    static int64_t getCurTime()// 获取当前系统启动以来的毫秒数
-    {
+    /**
+     * 获取当前系统启动以来的毫秒数
+     * @return 毫秒数
+     */
+    static int64_t getCurTime() {
         // Linux系统
-        struct timespec now;// tv_sec (s) tv_nsec (ns-纳秒)
+        struct timespec now; // tv_sec (s) tv_nsec (ns-纳秒)
         clock_gettime(CLOCK_MONOTONIC, &now);
         return (now.tv_sec * 1000 + now.tv_nsec / 1000000);
     }
-    static int64_t getCurTimestamp()// 获取毫秒级时间戳（13位）
-    {
+
+    /**
+     * 获取毫秒级时间戳（13位）
+     * @return 时间戳
+     */
+    static int64_t getCurTimestamp() {
         return std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).
             count();
     }
 
+    /**
+     * 获取随机数
+     * @return 随机数
+     */
     static int Common_GetRandom() {
         std::string numStr;
         numStr.append(std::to_string(rand() % 9 + 1));
@@ -45,38 +56,49 @@ namespace AVSAlarmManageLib {
         return num;
     }
 
+    /**
+     * 删除文件
+     * @param filename 文件名
+     * @return 是否删除成功
+     */
     static bool Common_RemoveFile(const std::string& filename) {
-
         if (remove(filename.data()) == 0) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
+    /**
+     * 创建目录（递归创建）
+     * @param dir 目录路径
+     */
     static void Common_mkdirs(const std::string& dir) {
-
-        if (access(dir.data(), 0) != 0) {// 文件夹不存在
-
+        if (access(dir.data(), 0) != 0) { // 文件夹不存在
             std::string command;
             command = "mkdir -p " + dir;
             system(command.c_str());
-
         }
-
     }
 
+    /**
+     * 使用 turboJpeg 压缩图像
+     * @param height 高度
+     * @param width 宽度
+     * @param channels 通道数
+     * @param bgr BGR格式图像数据
+     * @param out_data 输出数据指针
+     * @param out_size 输出数据大小
+     * @return 是否压缩成功
+     */
     static bool __turboJpeg_compress(int height, int width, int channels, unsigned char* bgr, unsigned char*& out_data, unsigned long* out_size) {
-
     #ifndef _DEBUG
-
         tjhandle handle = tjInitCompress();
         if (nullptr == handle) {
             return false;
         }
 
-        //pixel_format : TJPF::TJPF_BGR or other
+        // pixel_format : TJPF::TJPF_BGR or other
         const int JPEG_QUALITY = 75;
         int pixel_format = TJPF::TJPF_BGR;
         int pitch = tjPixelSize[pixel_format] * width;
@@ -94,8 +116,16 @@ namespace AVSAlarmManageLib {
     #endif // !_DEBUG
     }
 
+    /**
+     * 压缩图像
+     * @param height 高度
+     * @param width 宽度
+     * @param channels 通道数
+     * @param bgr BGR格式图像数据
+     * @param image 输出图像对象
+     * @return 是否压缩成功
+     */
     static bool Common_CompressImage(int height, int width, int channels, unsigned char* bgr, AVSAlarmImage* image) {
-
     #ifndef _DEBUG
         unsigned char* jpeg_data = nullptr;
         unsigned long  jpeg_size = 0;
@@ -107,8 +137,7 @@ namespace AVSAlarmManageLib {
             free(jpeg_data);
             jpeg_data = nullptr;
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     #else 
@@ -124,9 +153,16 @@ namespace AVSAlarmManageLib {
 
     #endif // !_DEBUG
     }
+
+    /**
+     * 解压图像
+     * @param image 压缩图像对象
+     * @param out_bgr 输出BGR数据
+     * @param out_bgrSize 输出BGR数据大小
+     * @return 是否解压成功
+     */
     static bool Common_UnCompressImage(AVSAlarmImage* image, unsigned char*& out_bgr, int out_bgrSize) {
     #ifndef _DEBUG
-
         unsigned char* jpeg_data = image->getData();
         unsigned long jpeg_size = image->getSize();
         int height = image->getHeight();
@@ -166,9 +202,16 @@ namespace AVSAlarmManageLib {
     #endif // !_DEBUG
     }
 
-    //将bgr格式的图片写入本地文件
+    /**
+     * 将BGR格式的图片写入本地文件
+     * @param height 高度
+     * @param width 宽度
+     * @param channels 通道数
+     * @param bgr BGR格式图像数据
+     * @param out_filename 输出文件名
+     * @return 是否保存成功
+     */
     static bool Common_SaveBgr(int height, int width, int channels, unsigned char* bgr, const std::string& out_filename) {
-
     #ifndef _DEBUG
         unsigned char* imageCompressed = nullptr;
         unsigned long  imageCompressedSize = 0;
@@ -176,7 +219,6 @@ namespace AVSAlarmManageLib {
         __turboJpeg_compress(height, width, channels, bgr, imageCompressed, &imageCompressedSize);
 
         if (imageCompressedSize > 0 && imageCompressed != nullptr) {
-
             FILE* file = fopen(out_filename.data(), "wb");
             fwrite(imageCompressed, 1, imageCompressedSize, file);
             fclose(file);
@@ -184,8 +226,7 @@ namespace AVSAlarmManageLib {
             free(imageCompressed);
             imageCompressed = nullptr;
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     #else
@@ -193,43 +234,55 @@ namespace AVSAlarmManageLib {
 
         if (cv::imwrite(out_filename, image)) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     #endif
     }
 
-    //将CompressImage压缩的图片写入本地文件
-    static bool Common_SaveCompressImage(AVSAlarmImage* image, const std::string& out_filename){
+    /**
+     * 将压缩的图片写入本地文件
+     * @param image 压缩图像对象
+     * @param out_filename 输出文件名
+     * @return 是否保存成功
+     */
+    static bool Common_SaveCompressImage(AVSAlarmImage* image, const std::string& out_filename) {
         FILE* file = fopen(out_filename.data(), "wb");
         if (file) {
             fwrite(image->getData(), 1, image->getSize(), file);
             fclose(file);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    // bgr24转yuv420p
-
-    static unsigned char clipValue(unsigned char x, unsigned char min_val, unsigned char  max_val) {
-
+    /**
+     * 裁剪值
+     * @param x 输入值
+     * @param min_val 最小值
+     * @param max_val 最大值
+     * @return 裁剪后的值
+     */
+    static unsigned char clipValue(unsigned char x, unsigned char min_val, unsigned char max_val) {
         if (x > max_val) {
             return max_val;
-        }
-        else if (x < min_val) {
+        } else if (x < min_val) {
             return min_val;
-        }
-        else {
+        } else {
             return x;
         }
     }
 
+    /**
+     * BGR24转YUV420P
+     * @param bgrBuf BGR数据
+     * @param w 宽度
+     * @param h 高度
+     * @param yuvBuf 输出YUV数据
+     * @return 是否转换成功
+     */
     static bool bgr24ToYuv420p(unsigned char* bgrBuf, int w, int h, unsigned char* yuvBuf) {
-
         unsigned char* ptrY, * ptrU, * ptrV, * ptrRGB;
         std::memset(yuvBuf, 0, w * h * 3 / 2);
         ptrY = yuvBuf;
@@ -238,14 +291,11 @@ namespace AVSAlarmManageLib {
         unsigned char y, u, v, r, g, b;
 
         for (int j = 0; j < h; ++j) {
-
             ptrRGB = bgrBuf + w * j * 3;
             for (int i = 0; i < w; i++) {
-
                 b = *(ptrRGB++);
                 g = *(ptrRGB++);
                 r = *(ptrRGB++);
-
 
                 y = (unsigned char)((66 * r + 129 * g + 25 * b + 128) >> 8) + 16;
                 u = (unsigned char)((-38 * r - 74 * g + 112 * b + 128) >> 8) + 128;
@@ -253,8 +303,7 @@ namespace AVSAlarmManageLib {
                 *(ptrY++) = clipValue(y, 0, 255);
                 if (j % 2 == 0 && i % 2 == 0) {
                     *(ptrU++) = clipValue(u, 0, 255);
-                }
-                else {
+                } else {
                     if (i % 2 == 0) {
                         *(ptrV++) = clipValue(v, 0, 255);
                     }
