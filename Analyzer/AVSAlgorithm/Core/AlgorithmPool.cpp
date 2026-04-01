@@ -23,12 +23,10 @@ namespace AVSAlgorithmLib {
 
     AlgorithmPool::AlgorithmPool(AlgorithmConfig* config) : mConfig(config)
     {
-        LOGI("");
-
+        LOGI("初始化算法池........");
         if (ALGORITHMTYPE_PY == mConfig->algorithmType) {
             //-------------------------初始化Py环境start--------------------------
             //Py_SetPythonHome(L"../../../Algorithm/Python");//指定PythonHome
-            //Py_SetPythonHome(L"F:\\Project\\AnalyzeVideo\\Algorithm\\Python");//指定PythonHome
             Py_Initialize();
             PyEval_InitThreads();// 启用多线程支持
             PyRun_SimpleString("import sys");
@@ -36,7 +34,6 @@ namespace AVSAlgorithmLib {
             std::string venv = "sys.path.append('" + config->algorithmPath + "')";
             PyRun_SimpleString(venv.data());
             //-------------------------初始化Py环境end--------------------------
-
 
             mAlgorithmQ_mtx.lock();
             for (size_t i = 0; i < mConfig->algorithmInstanceNum; i++)
@@ -79,7 +76,7 @@ namespace AVSAlgorithmLib {
 
     AlgorithmPool::~AlgorithmPool()
     {
-        LOGI("");
+        LOGI("关闭算法池........");
         mAlgorithmQ_mtx.lock();
         while (!mAlgorithmQ.empty())
         {

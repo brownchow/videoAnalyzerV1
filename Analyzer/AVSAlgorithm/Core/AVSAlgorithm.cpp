@@ -13,10 +13,8 @@ namespace AVSAlgorithmLib {
 
     bool AVSAlgorithm_Init(AlgorithmConfig* config) {
         if (mAlgorithmPool.get()) {
-        
             return true;
         }
-
         mAlgorithmPool = AlgorithmPool::Create(config);
         if (mAlgorithmPool.get()) {
             return true;
@@ -26,6 +24,7 @@ namespace AVSAlgorithmLib {
         }
 
     }
+
     bool AVSAlgorithm_Destory() {
         if (mAlgorithmPool.get()) {
             mAlgorithmPool.reset();
@@ -36,12 +35,12 @@ namespace AVSAlgorithmLib {
         }
  
     }
+    
     bool AVSAlgorithm_ObjectDetect(int height, int width, unsigned char* bgr, std::vector<AlgorithmDetectObject>& detects) {
         if (mAlgorithmPool.get()) {
             Algorithm* algorithm = mAlgorithmPool->gain();
             algorithm->objectDetect(height, width, bgr, detects);
             mAlgorithmPool->giveBack(algorithm);
-
             return true;
         }
         else {

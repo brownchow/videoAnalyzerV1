@@ -21,6 +21,7 @@ namespace AVSAnalyzer {
 
 		Scheduler(Config* config);
 		~Scheduler();
+		
 	public:
 		Config* getConfig();
 		void loop();
