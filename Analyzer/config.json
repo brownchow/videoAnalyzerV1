@@ -1,16 +1,26 @@
 {
+  "//adminHost": "Admin 服务地址",
   "adminHost": "http://127.0.0.1:9001",
+  "//rootVideoDir": "视频存储根目录",
   "rootVideoDir": "/home/harrison/project/BXC_VideoAnalyzer_v1/Algorithm/data",
+  "//subVideoDirFormat": "子目录格式，使用时间戳",
   "subVideoDirFormat": "%Y/%m/%d-%H-%M",
+  "//controlExecutorMaxNum": "控制执行器最大数量",
   "controlExecutorMaxNum": 200,
+  "//supportHardwareVideoDecode": "是否支持硬件视频解码",
   "supportHardwareVideoDecode": false,
+  "//supportHardwareVideoEncode": "是否支持硬件视频编码",
   "supportHardwareVideoEncode": false,
-  "algorithmType": "api", // py:基于python实现的算法 api:基于API实现的算法
-  "algorithmInstanceNum": 1, // 算法实例数量
+  "//algorithmType": "算法类型：py（基于Python）或 api（基于API）",
+  "algorithmType": "api",
+  "//algorithmInstanceNum": "算法实例数量",
+  "algorithmInstanceNum": 1,
+  "//algorithmPath": "算法路径",
   "algorithmPath": "/home/harrison/project/BXC_VideoAnalyzer_v1/Algorithm",
+  "//algorithmDevice": "算法运行设备：cpu 或 gpu",
   "algorithmDevice": "cpu",
+  "//algorithmApiHosts": "算法API主机列表",
   "algorithmApiHosts": [
     "http://127.0.0.1:9003"
   ]
-
 }

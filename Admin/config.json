@@ -1,7 +1,12 @@
 {
+    "//mediaApiHost": "媒体服务器API地址",
     "mediaApiHost"  : "http://127.0.0.1:80",
+    "//mediaHttpHost": "媒体服务器HTTP地址",
     "mediaHttpHost" : "http://127.0.0.1:80",
+    "//mediaRtmpHost": "媒体服务器RTMP地址",
     "mediaRtmpHost" : "rtmp://127.0.0.1:1935",
+    "//mediaRtspHost": "媒体服务器RTSP地址",
     "mediaRtspHost" : "rtmp://127.0.0.1:554",
+    "//analyzerApiHost": "分析器API地址",
     "analyzerApiHost" : "http://127.0.0.1:9002"
 }
