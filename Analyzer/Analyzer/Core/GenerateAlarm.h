@@ -22,7 +22,7 @@ namespace AVSAnalyzer {
 		Config* mConfig;
 		Control* mControl;
 
-		//��Ƶ֡
+		//视频帧
 		std::queue <VideoFrame*> mVideoFrameQ;
 		std::mutex               mVideoFrameQ_mtx;
 		bool getVideoFrame(VideoFrame*& frame, int& frameQSize);

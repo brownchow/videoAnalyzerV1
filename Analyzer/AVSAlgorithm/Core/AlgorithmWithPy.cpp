@@ -37,11 +37,11 @@ namespace AVSAlgorithmLib {
         init_numpy();
 #endif
 
-        mModule = PyImport_ImportModule("Algorithm");// pythonÄ£¿éÃû³Æ
-        //mModule = PyImport_ImportModule("Cpp");// pythonÄ£¿éÃû³Æ
-        mClass = PyObject_GetAttrString(mModule, "Algorithm");// »ñÈ¡pythonÀà
+        mModule = PyImport_ImportModule("Algorithm");// pythonæ¨¡å—åç§°
+        //mModule = PyImport_ImportModule("Cpp");// pythonæ¨¡å—åç§°
+        mClass = PyObject_GetAttrString(mModule, "Algorithm");// è·å–pythonç±»
 
-        // ÉèÖÃÀà³õÊ¼»¯µÄ²ÎÊıstart
+        // è®¾ç½®ç±»åˆå§‹åŒ–çš„å‚æ•°start
 
         PyObject* mClassArgs = PyTuple_New(2);
 
@@ -57,7 +57,7 @@ namespace AVSAlgorithmLib {
         PyTuple_SetItem(mClassArgs, 1, mClassArgs_params);
 
 
-        mObject = PyEval_CallObject(mClass, mClassArgs);// ÊµÀı»¯pythonÀà
+        mObject = PyEval_CallObject(mClass, mClassArgs);// å®ä¾‹åŒ–pythonç±»
 #ifndef _DEBUG
         Py_CLEAR(mClassArgs_weights_path);
         Py_CLEAR(mClassArgs_params);
@@ -65,11 +65,11 @@ namespace AVSAlgorithmLib {
 #endif
 
 
-        // ÉèÖÃÀà³õÊ¼»¯µÄ²ÎÊıstart
+        // è®¾ç½®ç±»åˆå§‹åŒ–çš„å‚æ•°start
 
 
-        mFunc_release = PyObject_GetAttrString(mObject, "release");// Ó³ÉäpythonÀàµÄ·½·¨
-        mFunc_objectDetect = PyObject_GetAttrString(mObject, "objectDetect");// Ó³ÉäpythonÀàµÄ·½·¨
+        mFunc_release = PyObject_GetAttrString(mObject, "release");// æ˜ å°„pythonç±»çš„æ–¹æ³•
+        mFunc_objectDetect = PyObject_GetAttrString(mObject, "objectDetect");// æ˜ å°„pythonç±»çš„æ–¹æ³•
         mFunc_objectDetectArgs = PyTuple_New(2);
 
 
@@ -168,7 +168,7 @@ namespace AVSAlgorithmLib {
             result = parseObjectDetect(response, detects);
         }
 
-        //LOGI("serialize spend£º%lld(ms),call python spend£º%lld(ms)", (t2 - t1), (t4 - t3));
+        //LOGI("serialize spendï¼š%lld(ms),call python spendï¼š%lld(ms)", (t2 - t1), (t4 - t3));
 
 #ifndef _DEBUG
         delete[]imageData;

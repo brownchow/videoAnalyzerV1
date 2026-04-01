@@ -30,7 +30,7 @@ namespace AVSAlarmManageLib {
             return false;
         }
 
-        // ³õÊ¼»¯ÊÓÆµ±àÂëÆ÷ start
+        // åˆå§‹åŒ–è§†é¢‘ç¼–ç å™¨ start
         AVCodec* videoCodec = avcodec_find_encoder(AV_CODEC_ID_H264);
         if (!videoCodec) {
             LOGE("avcodec_find_decoder error");
@@ -43,7 +43,7 @@ namespace AVSAlarmManageLib {
         }
         int bit_rate = 4000000; 
 
-        // CBR£ºConstant BitRate - ¹Ì¶¨±ÈÌØÂÊ
+        // CBRï¼šConstant BitRate - å›ºå®šæ¯”ç‰¹ç‡
     //    mVideoCodecCtx->flags |= AV_CODEC_FLAG_QSCALE;
     //    mVideoCodecCtx->bit_rate = bit_rate;
     //    mVideoCodecCtx->rc_min_rate = bit_rate;
@@ -56,11 +56,11 @@ namespace AVSAlarmManageLib {
         mVideoCodecCtx->rc_max_rate = bit_rate / 2 + bit_rate;
         mVideoCodecCtx->bit_rate = bit_rate;
 
-        //ABR£ºAverage Bitrate - Æ½¾ùÂëÂÊ
+        //ABRï¼šAverage Bitrate - å¹³å‡ç ç‡
     //    mVideoCodecCtx->bit_rate = bit_rate;
 
         mVideoCodecCtx->codec_id = videoCodec->id;
-        mVideoCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;// ²»Ö§³ÖAV_PIX_FMT_BGR24Ö±½Ó½øĞĞ±àÂë
+        mVideoCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;// ä¸æ”¯æŒAV_PIX_FMT_BGR24ç›´æ¥è¿›è¡Œç¼–ç 
         mVideoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         mVideoCodecCtx->width = mAlarm->width;
         mVideoCodecCtx->height = mAlarm->height;
@@ -70,7 +70,7 @@ namespace AVSAlarmManageLib {
         mVideoCodecCtx->max_b_frames = 5;
         mVideoCodecCtx->thread_count = 1;
 
-        //mVideoCodecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;  //È«¾Ö²ÎÊı
+        //mVideoCodecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;  //å…¨å±€å‚æ•°
 
         unsigned char sps_pps[] = { 0x00 ,0x00 ,0x01,0x67,0x42,0x00 ,0x2a ,0x96 ,0x35 ,0x40 ,0xf0 ,0x04 ,
                             0x4f ,0xcb ,0x37 ,0x01 ,0x01 ,0x01 ,0x40 ,0x00 ,0x01 ,0xc2 ,0x00 ,0x00 ,0x57 ,
@@ -97,10 +97,10 @@ namespace AVSAlarmManageLib {
             return false;
         }
         mVideoStream->id = mFmtCtx->nb_streams - 1;
-        // streamµÄtime_base²ÎÊı·Ç³£ÖØÒª£¬Ëü±íÊ¾½«ÏÖÊµÖĞµÄÒ»ÃëÖÓ·ÖÎª¶àÉÙ¸öÊ±¼ä»ù, ÔÚÏÂÃæµ÷ÓÃavformat_write_headerÊ±×Ô¶¯Íê³É
+        // streamçš„time_baseå‚æ•°éå¸¸é‡è¦ï¼Œå®ƒè¡¨ç¤ºå°†ç°å®ä¸­çš„ä¸€ç§’é’Ÿåˆ†ä¸ºå¤šå°‘ä¸ªæ—¶é—´åŸº, åœ¨ä¸‹é¢è°ƒç”¨avformat_write_headeræ—¶è‡ªåŠ¨å®Œæˆ
         avcodec_parameters_from_context(mVideoStream->codecpar, mVideoCodecCtx);
         mVideoIndex = mVideoStream->id;
-        // ³õÊ¼»¯ÊÓÆµ±àÂëÆ÷ end
+        // åˆå§‹åŒ–è§†é¢‘ç¼–ç å™¨ end
 
 
 
@@ -122,7 +122,7 @@ namespace AVSAlarmManageLib {
 
         mFmtCtx->video_codec_id = mFmtCtx->oformat->video_codec;
 
-        if (avformat_write_header(mFmtCtx, &fmt_options) < 0) { // µ÷ÓÃ¸Ãº¯Êı»á½«ËùÓĞstreamµÄtime_base£¬×Ô¶¯ÉèÖÃÒ»¸öÖµ£¬Í¨³£ÊÇ1/90000»ò1/1000£¬Õâ±íÊ¾Ò»ÃëÖÓ±íÊ¾µÄÊ±¼ä»ù³¤¶È
+        if (avformat_write_header(mFmtCtx, &fmt_options) < 0) { // è°ƒç”¨è¯¥å‡½æ•°ä¼šå°†æ‰€æœ‰streamçš„time_baseï¼Œè‡ªåŠ¨è®¾ç½®ä¸€ä¸ªå€¼ï¼Œé€šå¸¸æ˜¯1/90000æˆ–1/1000ï¼Œè¿™è¡¨ç¤ºä¸€ç§’é’Ÿè¡¨ç¤ºçš„æ—¶é—´åŸºé•¿åº¦
             LOGE("avformat_write_header error");
             return false;
         }
@@ -134,11 +134,11 @@ namespace AVSAlarmManageLib {
         //std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         if (mFmtCtx) {
-            // ÍÆÁ÷ĞèÒªÊÍ·Åstart
+            // æ¨æµéœ€è¦é‡Šæ”¾start
             if (mFmtCtx && !(mFmtCtx->oformat->flags & AVFMT_NOFILE)) {
                 avio_close(mFmtCtx->pb);
             }
-            // ÍÆÁ÷ĞèÒªÊÍ·Åend
+            // æ¨æµéœ€è¦é‡Šæ”¾end
 
 
 
@@ -185,7 +185,7 @@ namespace AVSAlarmManageLib {
             width, height, 1);
 
 
-        AVPacket* pkt = av_packet_alloc();// ±àÂëºóµÄÊÓÆµÖ¡
+        AVPacket* pkt = av_packet_alloc();// ç¼–ç åçš„è§†é¢‘å¸§
         int64_t  frameCount = 1;
 
         int ret = -1;
@@ -194,16 +194,16 @@ namespace AVSAlarmManageLib {
         AVSAlarmImage* image;
         int channels = 3;
         int bgrSize = width * height * channels;
-        unsigned char* bgr = (unsigned char*)malloc(bgrSize);//´´½¨¶ÑÄÚ´æ
+        unsigned char* bgr = (unsigned char*)malloc(bgrSize);//åˆ›å»ºå †å†…å­˜
 
         for (size_t i = 0; i < mAlarm->images.size(); i++)
         {
             image = mAlarm->images[i];
 
             if ( Common_UnCompressImage(image, bgr, bgrSize)){
-                //½âÑ¹Ëõ³É¹¦
+                //è§£å‹ç¼©æˆåŠŸ
 
-                 // frame_bgr ×ª  frame_yuv420p
+                 // frame_bgr è½¬  frame_yuv420p
                 bgr24ToYuv420p(bgr, width, height, frame_yuv420p_buff);
 
                 frame_yuv420p->pts = frame_yuv420p->pkt_dts = av_rescale_q_rnd(frameCount,
@@ -226,7 +226,7 @@ namespace AVSAlarmManageLib {
                         ret = avcodec_receive_packet(mVideoCodecCtx, pkt);
                         if (ret >= 0) {
                      
-                            //LOGI("encode 1 frame spend£º%lld(ms),frameCount=%lld, encodeSuccessCount = %lld, frameQSize=%d,ret=%d", 
+                            //LOGI("encode 1 frame spendï¼š%lld(ms),frameCount=%lld, encodeSuccessCount = %lld, frameQSize=%d,ret=%d", 
                             //    (t2 - t1), frameCount, encodeSuccessCount, frameQSize, ret);
 
                             pkt->stream_index = mVideoIndex;
@@ -279,7 +279,7 @@ namespace AVSAlarmManageLib {
         free(bgr);
         bgr = nullptr;
 
-        av_write_trailer(mFmtCtx);//Ğ´ÎÄ¼şÎ²
+        av_write_trailer(mFmtCtx);//å†™æ–‡ä»¶å°¾
 
         av_packet_unref(pkt);
         pkt = nullptr;

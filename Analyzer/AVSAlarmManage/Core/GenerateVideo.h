@@ -24,7 +24,7 @@ namespace AVSAlarmManageLib {
 		void destoryCodecCtx();
 
 		AVFormatContext* mFmtCtx = nullptr;
-		//��Ƶ֡
+		//视频帧
 		AVCodecContext* mVideoCodecCtx = nullptr;
 		AVStream* mVideoStream = nullptr;
 		int mVideoIndex = -1;

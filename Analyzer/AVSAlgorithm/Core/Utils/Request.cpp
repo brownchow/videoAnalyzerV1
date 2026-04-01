@@ -45,7 +45,7 @@ namespace AVSAlgorithmLib {
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
 
-            curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);//0 or 1 µ±µÈÓÚ1Ê±£¬»áÏÔÊ¾ÏêÏ¸µÄµ÷ÊÔĞÅÏ¢,
+            curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);//0 or 1 å½“ç­‰äº1æ—¶ï¼Œä¼šæ˜¾ç¤ºè¯¦ç»†çš„è°ƒè¯•ä¿¡æ¯,
             curl_easy_setopt(curl, CURLOPT_READFUNCTION, NULL);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, onWrite);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response);
@@ -86,10 +86,10 @@ namespace AVSAlgorithmLib {
             headers = curl_slist_append(headers, "User-Agent: AnalyVideo;");
             headers = curl_slist_append(headers, "Content-Type:application/json;");
             headers = curl_slist_append(headers,
-                "expect: ;");// libcurlÇëÇóÂı½â¾ö·½·¨ https://blog.csdn.net/feng964497595/article/details/86316861
+                "expect: ;");// libcurlè¯·æ±‚æ…¢è§£å†³æ–¹æ³• https://blog.csdn.net/feng964497595/article/details/86316861
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-            //²»½ÓÊÕÏìÓ¦Í·Êı¾İ0´ú±í²»½ÓÊÕ 1´ú±í½ÓÊÕ
+            //ä¸æ¥æ”¶å“åº”å¤´æ•°æ®0ä»£è¡¨ä¸æ¥æ”¶ 1ä»£è¡¨æ¥æ”¶
             curl_easy_setopt(curl, CURLOPT_HEADER, 0);
 
             curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -99,12 +99,12 @@ namespace AVSAlgorithmLib {
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false); // if want to use https
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false); // set peer and host verify false
 
-            curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);// ÖµÎª1Ê±£¬»áÏÔÊ¾ÏêÏ¸µÄµ÷ÊÔĞÅÏ¢
+            curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);// å€¼ä¸º1æ—¶ï¼Œä¼šæ˜¾ç¤ºè¯¦ç»†çš„è°ƒè¯•ä¿¡æ¯
             curl_easy_setopt(curl, CURLOPT_READFUNCTION, NULL);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, onWrite);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response);
             curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
-            // curl_easy_setopt(curl, CURLOPT_HEADER, false);// ÊÇ·ñÏÔÊ¾ÏìÓ¦Í·ĞÅÏ¢
+            // curl_easy_setopt(curl, CURLOPT_HEADER, false);// æ˜¯å¦æ˜¾ç¤ºå“åº”å¤´ä¿¡æ¯
             curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 30);
             curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
 
@@ -118,7 +118,7 @@ namespace AVSAlgorithmLib {
             else {
                 result = true;
             }
-            curl_slist_free_all(headers);//ÇåÀíheaders,·ÀÖ¹ÄÚ´æĞ¹Â©
+            curl_slist_free_all(headers);//æ¸…ç†headers,é˜²æ­¢å†…å­˜æ³„æ¼
 
 
         }

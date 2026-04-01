@@ -26,16 +26,16 @@ namespace AVSAlgorithmLib {
         LOGI("");
 
         if (ALGORITHMTYPE_PY == mConfig->algorithmType) {
-            //-------------------------³õÊ¼»¯Py»·¾³start--------------------------
-            //Py_SetPythonHome(L"../../../Algorithm/Python");//Ö¸¶¨PythonHome
-            //Py_SetPythonHome(L"F:\\Project\\AnalyzeVideo\\Algorithm\\Python");//Ö¸¶¨PythonHome
+            //-------------------------åˆå§‹åŒ–PyçŽ¯å¢ƒstart--------------------------
+            //Py_SetPythonHome(L"../../../Algorithm/Python");//æŒ‡å®šPythonHome
+            //Py_SetPythonHome(L"F:\\Project\\AnalyzeVideo\\Algorithm\\Python");//æŒ‡å®šPythonHome
             Py_Initialize();
-            PyEval_InitThreads();// ÆôÓÃ¶àÏß³ÌÖ§³Ö
+            PyEval_InitThreads();// å¯ç”¨å¤šçº¿ç¨‹æ”¯æŒ
             PyRun_SimpleString("import sys");
             //PyRun_SimpleString("for p in sys.path:sys.path.remove(p)");
             std::string venv = "sys.path.append('" + config->algorithmPath + "')";
             PyRun_SimpleString(venv.data());
-            //-------------------------³õÊ¼»¯Py»·¾³end--------------------------
+            //-------------------------åˆå§‹åŒ–PyçŽ¯å¢ƒend--------------------------
 
 
             mAlgorithmQ_mtx.lock();
@@ -46,7 +46,7 @@ namespace AVSAlgorithmLib {
             }
             mAlgorithmQ_mtx.unlock();
 
-            // ¿ªÆô¶àÏß³ÌµÄÇøÓò
+            // å¼€å¯å¤šçº¿ç¨‹çš„åŒºåŸŸ
             if (Py_IsInitialized()) {
                 _save = PyEval_SaveThread();
             }
@@ -92,7 +92,7 @@ namespace AVSAlgorithmLib {
         mAlgorithmQ_mtx.unlock();
 
         if (ALGORITHMTYPE_PY == mConfig->algorithmType) {
-            //-------------------------¹Ø±ÕPy»·¾³start--------------------------
+            //-------------------------å…³é—­PyçŽ¯å¢ƒstart--------------------------
             if (Py_IsInitialized()) {
                 LOGI("Py_IsInitialized() True");
             }
@@ -101,7 +101,7 @@ namespace AVSAlgorithmLib {
             }
 
             Py_Finalize();
-            //-------------------------¹Ø±ÕPy»·¾³end--------------------------
+            //-------------------------å…³é—­PyçŽ¯å¢ƒend--------------------------
         }
     }
 

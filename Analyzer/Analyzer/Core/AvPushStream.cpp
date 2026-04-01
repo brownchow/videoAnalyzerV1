@@ -37,7 +37,7 @@ namespace AVSAnalyzer {
             return false;
         }
 
-        // ³õÊ¼»¯ÊÓÆµ±àÂëÆ÷ start
+        // åˆå§‹åŒ–è§†é¢‘ç¼–ç å™¨ start
         AVCodec* videoCodec = avcodec_find_encoder(AV_CODEC_ID_H264);
         if (!videoCodec) {
             LOGE("avcodec_find_decoder error");
@@ -48,9 +48,9 @@ namespace AVSAnalyzer {
             LOGE("avcodec_alloc_context3 error");
             return false;
         }
-        int bit_rate = 300 * 1024 * 8;  //Ñ¹ËõºóÃ¿ÃëÊÓÆµµÄbitÎ»´óĞ¡ 300kB
+        int bit_rate = 300 * 1024 * 8;  //å‹ç¼©åæ¯ç§’è§†é¢‘çš„bitä½å¤§å° 300kB
 
-        // CBR£ºConstant BitRate - ¹Ì¶¨±ÈÌØÂÊ
+        // CBRï¼šConstant BitRate - å›ºå®šæ¯”ç‰¹ç‡
     //    mVideoCodecCtx->flags |= AV_CODEC_FLAG_QSCALE;
     //    mVideoCodecCtx->bit_rate = bit_rate;
     //    mVideoCodecCtx->rc_min_rate = bit_rate;
@@ -63,11 +63,11 @@ namespace AVSAnalyzer {
         mVideoCodecCtx->rc_max_rate = bit_rate / 2 + bit_rate;
         mVideoCodecCtx->bit_rate = bit_rate;
 
-        //ABR£ºAverage Bitrate - Æ½¾ùÂëÂÊ
+        //ABRï¼šAverage Bitrate - å¹³å‡ç ç‡
     //    mVideoCodecCtx->bit_rate = bit_rate;
 
         mVideoCodecCtx->codec_id = videoCodec->id;
-        mVideoCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;// ²»Ö§³ÖAV_PIX_FMT_BGR24Ö±½Ó½øĞĞ±àÂë
+        mVideoCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;// ä¸æ”¯æŒAV_PIX_FMT_BGR24ç›´æ¥è¿›è¡Œç¼–ç 
         mVideoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         mVideoCodecCtx->width = mControl->videoWidth;
         mVideoCodecCtx->height = mControl->videoHeight;
@@ -77,7 +77,7 @@ namespace AVSAnalyzer {
         mVideoCodecCtx->max_b_frames = 0;
         mVideoCodecCtx->thread_count = 1;
 
-        //mVideoCodecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;  //È«¾Ö²ÎÊı
+        //mVideoCodecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;  //å…¨å±€å‚æ•°
 
         unsigned char sps_pps[] = { 0x00 ,0x00 ,0x01,0x67,0x42,0x00 ,0x2a ,0x96 ,0x35 ,0x40 ,0xf0 ,0x04 ,
                             0x4f ,0xcb ,0x37 ,0x01 ,0x01 ,0x01 ,0x40 ,0x00 ,0x01 ,0xc2 ,0x00 ,0x00 ,0x57 ,
@@ -122,15 +122,15 @@ namespace AVSAnalyzer {
             return false;
         }
         mVideoStream->id = mFmtCtx->nb_streams - 1;
-        // streamµÄtime_base²ÎÊı·Ç³£ÖØÒª£¬Ëü±íÊ¾½«ÏÖÊµÖĞµÄÒ»ÃëÖÓ·ÖÎª¶àÉÙ¸öÊ±¼ä»ù, ÔÚÏÂÃæµ÷ÓÃavformat_write_headerÊ±×Ô¶¯Íê³É
+        // streamçš„time_baseå‚æ•°éå¸¸é‡è¦ï¼Œå®ƒè¡¨ç¤ºå°†ç°å®ä¸­çš„ä¸€ç§’é’Ÿåˆ†ä¸ºå¤šå°‘ä¸ªæ—¶é—´åŸº, åœ¨ä¸‹é¢è°ƒç”¨avformat_write_headeræ—¶è‡ªåŠ¨å®Œæˆ
         avcodec_parameters_from_context(mVideoStream->codecpar, mVideoCodecCtx);
         mVideoIndex = mVideoStream->id;
-        // ³õÊ¼»¯ÊÓÆµ±àÂëÆ÷ end
+        // åˆå§‹åŒ–è§†é¢‘ç¼–ç å™¨ end
 
 
 
         if (mControl->audioIndex > -1) {
-            // ³õÊ¼»¯ÒôÆµ±àÂëÆ÷ start
+            // åˆå§‹åŒ–éŸ³é¢‘ç¼–ç å™¨ start
             AVCodec* audioCodec = avcodec_find_encoder(AV_CODEC_ID_AAC);
             if (!audioCodec) {
                 LOGE("avcodec_find_decoder error");
@@ -145,17 +145,17 @@ namespace AVSAnalyzer {
 
             mAudioCodecCtx->codec_id = audioCodec->id;
             mAudioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-            mAudioCodecCtx->bit_rate = 128000;//ÒôÆµÂëÂÊ
-            mAudioCodecCtx->channel_layout = AV_CH_LAYOUT_STEREO;// ÉùµÀ²ã
-            mAudioCodecCtx->channels = av_get_channel_layout_nb_channels(mAudioCodecCtx->channel_layout);// ÉùµÀÊı
-            mAudioCodecCtx->sample_rate = 44100;//²ÉÑùÂÊ
-            mAudioCodecCtx->frame_size = 1024;//Ã¿Ö¡µ¥¸öÍ¨µÀµÄ²ÉÑùµãÊı
+            mAudioCodecCtx->bit_rate = 128000;//éŸ³é¢‘ç ç‡
+            mAudioCodecCtx->channel_layout = AV_CH_LAYOUT_STEREO;// å£°é“å±‚
+            mAudioCodecCtx->channels = av_get_channel_layout_nb_channels(mAudioCodecCtx->channel_layout);// å£°é“æ•°
+            mAudioCodecCtx->sample_rate = 44100;//é‡‡æ ·ç‡
+            mAudioCodecCtx->frame_size = 1024;//æ¯å¸§å•ä¸ªé€šé“çš„é‡‡æ ·ç‚¹æ•°
             mAudioCodecCtx->profile = FF_PROFILE_AAC_LOW;
-            mAudioCodecCtx->sample_fmt = AV_SAMPLE_FMT_FLTP;//ffmpeg¶ÔÓÚAAC±àÂëµÄ²ÉÑùµã¸ñÊ½Ä¬ÈÏÖ»Ö§³ÖAV_SAMPLE_FMT_FLTP£¬Í¨³£PCMÎÄ¼ş»òÕß²¥·ÅÆ÷²¥·ÅµÄÒôÆµ²ÉÑùµã¸ñÊ½ÊÇ AV_SAMPLE_FMT_S16
+            mAudioCodecCtx->sample_fmt = AV_SAMPLE_FMT_FLTP;//ffmpegå¯¹äºAACç¼–ç çš„é‡‡æ ·ç‚¹æ ¼å¼é»˜è®¤åªæ”¯æŒAV_SAMPLE_FMT_FLTPï¼Œé€šå¸¸PCMæ–‡ä»¶æˆ–è€…æ’­æ”¾å™¨æ’­æ”¾çš„éŸ³é¢‘é‡‡æ ·ç‚¹æ ¼å¼æ˜¯ AV_SAMPLE_FMT_S16
             mAudioCodecCtx->time_base = { 1024, 44100 };
             mAudioCodecCtx->framerate = { 44100, 1024 };
 
-            // ½«±àÂëÆ÷ÉÏÏÂÎÄºÍ±àÂëÆ÷½øĞĞ¹ØÁª
+            // å°†ç¼–ç å™¨ä¸Šä¸‹æ–‡å’Œç¼–ç å™¨è¿›è¡Œå…³è”
             if (avcodec_open2(mAudioCodecCtx, audioCodec, NULL) < 0) {
                 LOGE("avcodec_open2 error");
                 return false;
@@ -169,7 +169,7 @@ namespace AVSAnalyzer {
             avcodec_parameters_from_context(mAudioStream->codecpar, mAudioCodecCtx);
             mAudioIndex = mAudioStream->id;
 
-            // ³õÊ¼»¯ÒôÆµ±àÂëÆ÷ end
+            // åˆå§‹åŒ–éŸ³é¢‘ç¼–ç å™¨ end
 
         }
 
@@ -186,8 +186,8 @@ namespace AVSAnalyzer {
 
         AVDictionary* fmt_options = NULL;
         //av_dict_set(&fmt_options, "bufsize", "1024", 0);
-        av_dict_set(&fmt_options, "rw_timeout", "30000000", 0); //ÉèÖÃrtmp/http-flvÁ¬½Ó³¬Ê±£¨µ¥Î» us£©
-        av_dict_set(&fmt_options, "stimeout", "30000000", 0);   //ÉèÖÃrtspÁ¬½Ó³¬Ê±£¨µ¥Î» us£©
+        av_dict_set(&fmt_options, "rw_timeout", "30000000", 0); //è®¾ç½®rtmp/http-flvè¿æ¥è¶…æ—¶ï¼ˆå•ä½ usï¼‰
+        av_dict_set(&fmt_options, "stimeout", "30000000", 0);   //è®¾ç½®rtspè¿æ¥è¶…æ—¶ï¼ˆå•ä½ usï¼‰
         av_dict_set(&fmt_options, "rtsp_transport", "tcp", 0);
         //av_dict_set(&fmt_options, "muxdelay", "0.1", 0);
         //av_dict_set(&fmt_options, "tune", "zerolatency", 0);
@@ -195,7 +195,7 @@ namespace AVSAnalyzer {
         mFmtCtx->video_codec_id = mFmtCtx->oformat->video_codec;
         mFmtCtx->audio_codec_id = mFmtCtx->oformat->audio_codec;
 
-        if (avformat_write_header(mFmtCtx, &fmt_options) < 0) { // µ÷ÓÃ¸Ãº¯Êı»á½«ËùÓĞstreamµÄtime_base£¬×Ô¶¯ÉèÖÃÒ»¸öÖµ£¬Í¨³£ÊÇ1/90000»ò1/1000£¬Õâ±íÊ¾Ò»ÃëÖÓ±íÊ¾µÄÊ±¼ä»ù³¤¶È
+        if (avformat_write_header(mFmtCtx, &fmt_options) < 0) { // è°ƒç”¨è¯¥å‡½æ•°ä¼šå°†æ‰€æœ‰streamçš„time_baseï¼Œè‡ªåŠ¨è®¾ç½®ä¸€ä¸ªå€¼ï¼Œé€šå¸¸æ˜¯1/90000æˆ–1/1000ï¼Œè¿™è¡¨ç¤ºä¸€ç§’é’Ÿè¡¨ç¤ºçš„æ—¶é—´åŸºé•¿åº¦
             LOGE("avformat_write_header error");
             return false;
         }
@@ -229,11 +229,11 @@ namespace AVSAnalyzer {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         if (mFmtCtx) {
-            // ÍÆÁ÷ĞèÒªÊÍ·Åstart
+            // æ¨æµéœ€è¦é‡Šæ”¾start
             if (mFmtCtx && !(mFmtCtx->oformat->flags & AVFMT_NOFILE)) {
                 avio_close(mFmtCtx->pb);
             }
-            // ÍÆÁ÷ĞèÒªÊÍ·Åend
+            // æ¨æµéœ€è¦é‡Šæ”¾end
 
 
 
@@ -467,8 +467,8 @@ namespace AVSAnalyzer {
         int width = executor->mControl->videoWidth;
         int height = executor->mControl->videoHeight;
 
-        VideoFrame* videoFrame = NULL; // Î´±àÂëµÄÊÓÆµÖ¡£¨bgr¸ñÊ½£©
-        int         videoFrameQSize = 0; // Î´±àÂëÊÓÆµÖ¡¶ÓÁĞµ±Ç°³¤¶È
+        VideoFrame* videoFrame = NULL; // æœªç¼–ç çš„è§†é¢‘å¸§ï¼ˆbgræ ¼å¼ï¼‰
+        int         videoFrameQSize = 0; // æœªç¼–ç è§†é¢‘å¸§é˜Ÿåˆ—å½“å‰é•¿åº¦
 
         AVFrame* frame_yuv420p = av_frame_alloc();
         frame_yuv420p->format = executor->mPushStream->mVideoCodecCtx->pix_fmt;
@@ -484,7 +484,7 @@ namespace AVSAnalyzer {
 
 
 
-        AVPacket* pkt = av_packet_alloc();// ±àÂëºóµÄÊÓÆµÖ¡
+        AVPacket* pkt = av_packet_alloc();// ç¼–ç åçš„è§†é¢‘å¸§
         int64_t  encodeSuccessCount = 0;
         int64_t  frameCount = 0;
 
@@ -497,7 +497,7 @@ namespace AVSAnalyzer {
                 //executor->mAnalyzer->show(frame_bgr);
                 //executor->mAnalyzer->show(frame_yuv420p->linesize, frame_yuv420p->data);
 
-                // frame_bgr ×ª  frame_yuv420p
+                // frame_bgr è½¬  frame_yuv420p
                 executor->mPushStream->bgr24ToYuv420p(videoFrame->data, width, height, frame_yuv420p_buff);
                 executor->mPushStream->pushReusedVideoFrame(videoFrame);
 
@@ -522,11 +522,11 @@ namespace AVSAnalyzer {
                         t2 = Analyzer_getCurTime();
                         encodeSuccessCount++;
 
-                        //LOGI("encode 1 frame spend£º%lld(ms),frameCount=%lld, encodeSuccessCount = %lld, frameQSize=%d,ret=%d", 
+                        //LOGI("encode 1 frame spendï¼š%lld(ms),frameCount=%lld, encodeSuccessCount = %lld, frameQSize=%d,ret=%d", 
                         //    (t2 - t1), frameCount, encodeSuccessCount, frameQSize, ret);
 
 
-                        // Èç¹ûÊµ¼ÊÍÆÁ÷µÄÊÇflvÎÄ¼ş£¬²»»áÖ´ĞĞÀïÃæµÄfix_packet_pts
+                        // å¦‚æœå®é™…æ¨æµçš„æ˜¯flvæ–‡ä»¶ï¼Œä¸ä¼šæ‰§è¡Œé‡Œé¢çš„fix_packet_pts
                         if (pkt->pts == AV_NOPTS_VALUE) {
                             LOGE("pkt->pts == AV_NOPTS_VALUE");
 
@@ -559,7 +559,7 @@ namespace AVSAnalyzer {
             }
         }
 
-        //av_write_trailer(executor->mPushStream->mFmtCtx);//Ğ´ÎÄ¼şÎ²
+        //av_write_trailer(executor->mPushStream->mFmtCtx);//å†™æ–‡ä»¶å°¾
 
         av_packet_unref(pkt);
         pkt = NULL;
@@ -579,26 +579,26 @@ namespace AVSAnalyzer {
 
         ControlExecutor* executor = (ControlExecutor*)arg;
 
-        AudioFrame* audioFrame = NULL; // Î´±àÂëµÄÒôÆµÖ¡£¨pcm¸ñÊ½£©
-        int      audioFrameQSize = 0; // Î´±àÂëÒôÆµÖ¡¶ÓÁĞµ±Ç°³¤¶È
+        AudioFrame* audioFrame = NULL; // æœªç¼–ç çš„éŸ³é¢‘å¸§ï¼ˆpcmæ ¼å¼ï¼‰
+        int      audioFrameQSize = 0; // æœªç¼–ç éŸ³é¢‘å¸§é˜Ÿåˆ—å½“å‰é•¿åº¦
 
-         // ÒôÆµÊäÈë²ÎÊıstart
-        uint64_t in_channel_layout = AV_CH_LAYOUT_STEREO;// ÊäÈëÉùµÀ²ã
-        int in_channels = av_get_channel_layout_nb_channels(in_channel_layout);// ÊäÈëÉùµÀÊı
-        //in_channel_layout = av_get_default_channel_layout(in_channels);// ÊäÈëÉùµÀ²ã
+         // éŸ³é¢‘è¾“å…¥å‚æ•°start
+        uint64_t in_channel_layout = AV_CH_LAYOUT_STEREO;// è¾“å…¥å£°é“å±‚
+        int in_channels = av_get_channel_layout_nb_channels(in_channel_layout);// è¾“å…¥å£°é“æ•°
+        //in_channel_layout = av_get_default_channel_layout(in_channels);// è¾“å…¥å£°é“å±‚
         AVSampleFormat in_sample_fmt = AV_SAMPLE_FMT_S16;
         int in_sample_rate = 44100;
         int in_nb_samples = 1024;
-        // ÒôÆµÊäÈë²ÎÊıend
+        // éŸ³é¢‘è¾“å…¥å‚æ•°end
 
 
-       // ÒôÆµÖØ²ÉÑùÊä³ö²ÎÊıstart
+       // éŸ³é¢‘é‡é‡‡æ ·è¾“å‡ºå‚æ•°start
         uint64_t out_channel_layout = AV_CH_LAYOUT_STEREO;
         int out_channels = av_get_channel_layout_nb_channels(out_channel_layout);
         AVSampleFormat out_sample_fmt = AV_SAMPLE_FMT_FLTP;
         int out_sample_rate = 44100;
         int out_nb_samples = 1024;
-        // ÒôÆµÖØ²ÉÑùÊä³ö²ÎÊıend
+        // éŸ³é¢‘é‡é‡‡æ ·è¾“å‡ºå‚æ•°end
 
 
         struct SwrContext* swr_ctx_audioConvert = swr_alloc();
@@ -628,7 +628,7 @@ namespace AVSAnalyzer {
         av_samples_alloc(convert_data, NULL, out_channels, out_nb_samples, out_sample_fmt, 0);
 
 
-        AVPacket* pkt = av_packet_alloc();// ±àÂëºóµÄÒôÆµÖ¡
+        AVPacket* pkt = av_packet_alloc();// ç¼–ç åçš„éŸ³é¢‘å¸§
         int64_t  encodeSuccessCount = 0;
         int64_t  frameCount = 0;
 
@@ -641,7 +641,7 @@ namespace AVSAnalyzer {
 
                 memcpy(frame_buff, audioFrame->data, audioFrame->size);
 
-                // ÖØ²ÉÑù
+                // é‡é‡‡æ ·
                 swr_convert(swr_ctx_audioConvert, convert_data, executor->mPushStream->mAudioCodecCtx->frame_size,
                     (const uint8_t**)frame->data, frame->nb_samples);
 
@@ -670,10 +670,10 @@ namespace AVSAnalyzer {
                         t2 = Analyzer_getCurTime();
                         encodeSuccessCount++;
 
-                        //LOGI("encode 1 frame spend£º%lld(ms),frameCount=%lld, encodeSuccessCount = %lld, frameQSize=%d,ret=%d",
+                        //LOGI("encode 1 frame spendï¼š%lld(ms),frameCount=%lld, encodeSuccessCount = %lld, frameQSize=%d,ret=%d",
                         //    (t2 - t1), frameCount, encodeSuccessCount, frameQSize, ret);
 
-                        // Èç¹ûÊµ¼ÊÍÆÁ÷µÄÊÇflvÎÄ¼ş£¬²»»áÖ´ĞĞÀïÃæµÄfix_packet_pts
+                        // å¦‚æœå®é™…æ¨æµçš„æ˜¯flvæ–‡ä»¶ï¼Œä¸ä¼šæ‰§è¡Œé‡Œé¢çš„fix_packet_pts
                         if (pkt->pts == AV_NOPTS_VALUE) {
                             LOGE("pkt->pts == AV_NOPTS_VALUE");
 
