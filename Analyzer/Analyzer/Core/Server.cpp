@@ -74,6 +74,7 @@ void Server::start(void* arg) {
 
 /**
  * 处理根路径请求
+ * 路由：GET /
  * @param req HTTP 请求
  * @param arg 附加参数
  */
@@ -97,6 +98,7 @@ void api_index(struct evhttp_request* req, void* arg) {
 
 /**
  * 健康检查接口
+ * 路由：POST /api/health
  * @param req HTTP 请求
  * @param arg 附加参数（调度器指针）
  */
@@ -120,6 +122,7 @@ void api_health(struct evhttp_request* req, void* arg) {
 
 /**
  * 获取所有控制执行器接口
+ * 路由：POST /api/controls
  * @param req HTTP 请求
  * @param arg 附加参数（调度器指针）
  */
@@ -183,6 +186,7 @@ void api_controls(struct evhttp_request* req, void* arg) {
 
 /**
  * 获取单个控制执行器接口
+ * 路由：POST /api/control
  * @param req HTTP 请求
  * @param arg 附加参数（调度器指针）
  */
@@ -236,6 +240,7 @@ void api_control(struct evhttp_request* req, void* arg) {
 
 /**
  * 添加控制执行器接口
+ * 路由：POST /api/control/add
  * @param req HTTP 请求
  * @param arg 附加参数（调度器指针）
  */
@@ -291,6 +296,7 @@ void api_control_add(struct evhttp_request* req, void* arg) {
 
 /**
  * 取消控制执行器接口
+ * 路由：POST /api/control/cancel
  * @param req HTTP 请求
  * @param arg 附加参数（调度器指针）
  */
