@@ -7,6 +7,11 @@
 #include "Control.h"
 
 namespace AVSAnalyzer {
+    /**
+     * 构造函数
+     * @param scheduler 调度器指针
+     * @param control 控制信息指针
+     */
     Analyzer::Analyzer(Scheduler* scheduler, Control* control) :
         mScheduler(scheduler),
         mControl(control)
@@ -14,6 +19,9 @@ namespace AVSAnalyzer {
         initSDL();
     }
 
+    /**
+     * 析构函数
+     */
     Analyzer::~Analyzer()
     {
         mDetects.clear();
@@ -21,11 +29,19 @@ namespace AVSAnalyzer {
 
     }
 
+    /**
+     * 检查视频帧
+     * @param check 是否进行检查
+     * @param frameCount 帧计数
+     * @param data 视频帧数据（BGR格式）
+     * @param happenScore 事件发生的分数
+     * @return 是否检测到事件
+     */
     bool Analyzer::checkVideoFrame(bool check, int64_t frameCount, unsigned char* data, float& happenScore) {
         bool happen = false;
 
         cv::Mat image(mControl->videoHeight, mControl->videoWidth, CV_8UC3, data);
-        //cv::Mat image = cv::imread("D:\\file\\data\\images\\1.jpg");
+        //cv::Mat image = cv::imread("D:\file\data\images\1.jpg");
         //cv::imshow("image", image);
         //cv::waitKey(0);
         //cv::destroyAllWindows();
@@ -77,18 +93,31 @@ namespace AVSAnalyzer {
         return happen;
 
     }
-    bool Analyzer::checkAudioFrame(bool check, int64_t frameCount, unsigned char* data, int size) {
 
+    /**
+     * 检查音频帧
+     * @param check 是否进行检查
+     * @param frameCount 帧计数
+     * @param data 音频帧数据
+     * @param size 数据大小
+     * @return 是否检测到事件
+     */
+    bool Analyzer::checkAudioFrame(bool check, int64_t frameCount, unsigned char* data, int size) {
         return false;
     }
+
+    /**
+     * 显示BGR格式的图片
+     * @param data BGR格式的图片数据
+     */
     void Analyzer::SDLShow(unsigned char* data) {
 #if PLAY
-        SDL_UpdateTexture(mSDLTexture_BGR24, nullptr, data, mWidth * 3);
+        SDL_UpdateTexture(mSDLTexture_BGR24, nullptr, data, mControl->videoWidth * 3);
 
         mSDLRect.x = 0;
         mSDLRect.y = 0;
-        mSDLRect.w = mWidth;
-        mSDLRect.h = mHeight;
+        mSDLRect.w = mControl->videoWidth;
+        mSDLRect.h = mControl->videoHeight;
 
         SDL_RenderClear(mSDLRenderer);//清屏
         SDL_RenderCopy(mSDLRenderer, mSDLTexture_BGR24, nullptr, &mSDLRect);//复制材质到渲染器
@@ -97,6 +126,11 @@ namespace AVSAnalyzer {
 
     }
 
+    /**
+     * 显示YUV格式的图片
+     * @param linesize 每行的大小
+     * @param data YUV格式的图片数据
+     */
     void Analyzer::SDLShow(int linesize[8], unsigned char* data[8]) {
 
 #if PLAY
@@ -107,8 +141,8 @@ namespace AVSAnalyzer {
 
         mSDLRect.x = 0;
         mSDLRect.y = 0;
-        mSDLRect.w = mWidth;
-        mSDLRect.h = mHeight;
+        mSDLRect.w = mControl->videoWidth;
+        mSDLRect.h = mControl->videoHeight;
 
         SDL_RenderClear(mSDLRenderer);//清屏
         SDL_RenderCopy(mSDLRenderer, mSDLTexture_IYUV, nullptr, &mSDLRect);//复制材质到渲染器
@@ -117,6 +151,10 @@ namespace AVSAnalyzer {
 #endif // PLAY
     }
 
+    /**
+     * 初始化SDL
+     * @return 0表示成功，-1表示失败
+     */
     int Analyzer::initSDL() {
 
 #if PLAY
@@ -130,7 +168,7 @@ namespace AVSAnalyzer {
         mSDLWindow = SDL_CreateWindow("Analy",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
-            mWidth, mHeight,
+            mControl->videoWidth, mControl->videoHeight,
             SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
         if (!mSDLWindow) {
             LOGE("SDL_CreateWindow error");
@@ -147,7 +185,7 @@ namespace AVSAnalyzer {
         mSDLTexture_IYUV = SDL_CreateTexture(mSDLRenderer,
             SDL_PIXELFORMAT_IYUV,
             SDL_TEXTUREACCESS_STREAMING,
-            mWidth, mHeight
+            mControl->videoWidth, mControl->videoHeight
         );
         if (!mSDLTexture_IYUV) {
             LOGE("SDL_CreateTexture mSDLTexture_IYUV error");
@@ -156,7 +194,7 @@ namespace AVSAnalyzer {
         mSDLTexture_BGR24 = SDL_CreateTexture(mSDLRenderer,
             SDL_PIXELFORMAT_BGR24,
             SDL_TEXTUREACCESS_STREAMING,
-            mWidth, mHeight
+            mControl->videoWidth, mControl->videoHeight
         );
         if (!mSDLTexture_BGR24) {
             LOGE("SDL_CreateTexture mSDLTexture_BGR24 error");
@@ -171,6 +209,10 @@ namespace AVSAnalyzer {
 
     }
 
+    /**
+     * 销毁SDL
+     * @return 0表示成功
+     */
     int Analyzer::destorySDL() {
 #if PLAY
         if (mSDLWindow)
