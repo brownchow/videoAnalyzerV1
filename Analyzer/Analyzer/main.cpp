@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 	server.start(&scheduler);
 	printf("API服务器启动成功，监听地址: %s:%d\n\n", ip, port);
 
-	// 启动调度器主循环
+	// 启动调度器主循环，告警循环线程，1秒钟检查一次
 	printf("启动调度器主循环...\n");
 	scheduler.loop();
 

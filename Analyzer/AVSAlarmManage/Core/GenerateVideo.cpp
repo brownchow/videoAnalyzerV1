@@ -10,19 +10,29 @@ extern "C" {
 #pragma warning(disable: 4996)
 
 namespace AVSAlarmManageLib {
+    /**
+     * 构造函数
+     * @param alarm 报警对象，包含 width/height/fps 等信息
+     */
     GenerateVideo::GenerateVideo(AVSAlarm* alarm) :
         mAlarm(alarm)
     {
         LOGI("");
     }
 
+    /**
+     * 析构函数，释放视频编码资源
+     */
     GenerateVideo::~GenerateVideo()
     {
         LOGI("");
         destoryCodecCtx();
-
     }
 
+    /**
+     * 初始化视频编码上下文
+     * @param url 输出文件路径(例如 xxx.flv)
+     */
     bool GenerateVideo::initCodecCtx(const char* url) {
 
         if (avformat_alloc_output_context2(&mFmtCtx, NULL, "flv", url) < 0) {
@@ -129,6 +139,8 @@ namespace AVSAlarmManageLib {
 
         return true;
     }
+
+    
     void GenerateVideo::destoryCodecCtx() {
 
         //std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -162,16 +174,19 @@ namespace AVSAlarmManageLib {
     }
 
     bool GenerateVideo::run(const char* rootVideoDir, const char* subVideoDirFormat) {
- 
-        std::string url = std::string(rootVideoDir) + "\\" + std::to_string(getCurTimestamp()) + "_" + std::to_string(Common_GetRandom()) + ".flv";
-        
+        // 拼接输出文件路径：rootVideoDir/时间戳_随机数.flv
+        // 注意：Linux 下使用 '/'，Windows 也支持 '/'，因此使用跨平台路径分隔符
+        std::string url = std::string(rootVideoDir) + "/" + std::to_string(getCurTimestamp()) + "_" + std::to_string(Common_GetRandom()) + ".flv";
+
+        // 初始化编码环境（文件流、编码器、流参数等）
         if (!initCodecCtx(url.data())) {
             return false;
         }
 
         int width = mAlarm->width;
         int height = mAlarm->height;
-  
+
+        // 分配 YUV420P 图像帧缓冲区
         AVFrame* frame_yuv420p = av_frame_alloc();
         frame_yuv420p->format = mVideoCodecCtx->pix_fmt;
         frame_yuv420p->width = width;
@@ -184,9 +199,8 @@ namespace AVSAlarmManageLib {
             AV_PIX_FMT_YUV420P,
             width, height, 1);
 
-
-        AVPacket* pkt = av_packet_alloc();// 编码后的视频帧
-        int64_t  frameCount = 1;
+        AVPacket* pkt = av_packet_alloc(); // 编码后的视频包
+        int64_t frameCount = 1;
 
         int ret = -1;
         int receive_packet_count = -1;
@@ -194,16 +208,14 @@ namespace AVSAlarmManageLib {
         AVSAlarmImage* image;
         int channels = 3;
         int bgrSize = width * height * channels;
-        unsigned char* bgr = (unsigned char*)malloc(bgrSize);//创建堆内存
+        unsigned char* bgr = (unsigned char*)malloc(bgrSize); // BGR 数据缓冲
 
+        // 逐帧处理报警图片数组
         for (size_t i = 0; i < mAlarm->images.size(); i++)
         {
             image = mAlarm->images[i];
-
-            if ( Common_UnCompressImage(image, bgr, bgrSize)){
-                //解压缩成功
-
-                 // frame_bgr 转  frame_yuv420p
+            if (Common_UnCompressImage(image, bgr, bgrSize)) {
+                // 准备 YUV420P 数据并编码写入文件
                 bgr24ToYuv420p(bgr, width, height, frame_yuv420p_buff);
 
                 frame_yuv420p->pts = frame_yuv420p->pkt_dts = av_rescale_q_rnd(frameCount,
@@ -218,31 +230,22 @@ namespace AVSAlarmManageLib {
 
                 frame_yuv420p->pkt_pos = frameCount;
 
-             
                 ret = avcodec_send_frame(mVideoCodecCtx, frame_yuv420p);
                 if (ret >= 0) {
                     receive_packet_count = 0;
-                    while(true){
+                    while (true) {
                         ret = avcodec_receive_packet(mVideoCodecCtx, pkt);
                         if (ret >= 0) {
-                     
-                            //LOGI("encode 1 frame spend：%lld(ms),frameCount=%lld, encodeSuccessCount = %lld, frameQSize=%d,ret=%d", 
-                            //    (t2 - t1), frameCount, encodeSuccessCount, frameQSize, ret);
-
                             pkt->stream_index = mVideoIndex;
-
                             pkt->pos = frameCount;
                             pkt->duration = frame_yuv420p->pkt_duration;
-
 
                             int wframe = av_write_frame(mFmtCtx, pkt);
                             if (wframe < 0) {
                                 LOGE("writePkt : wframe=%d", wframe);
                             }
                             ++receive_packet_count;
-                          
-
-                            if (receive_packet_count >1 ) {
+                            if (receive_packet_count > 1) {
                                 LOGI("avcodec_receive_packet success: receive_packet_count=%d", receive_packet_count);
                             }
                         }
@@ -250,50 +253,36 @@ namespace AVSAlarmManageLib {
                             if (0 == receive_packet_count) {
                                 LOGE("avcodec_receive_packet error : ret=%d", ret);
                             }
-
                             break;
                         }
                     }
-
                 }
                 else {
                     LOGE("avcodec_send_frame error : ret=%d", ret);
                 }
                 frameCount++;
-           
-
-
-                //std::string imageName = mAlarm->videoDir + "\\" + std::to_string(getCurTimestamp()) + "_" + std::to_string(Common_GetRandom())+"_" + std::to_string(i) + ".jpg";
-                //Common_SaveCompressImage(image, imageName);
-                //bool s = false;
-                //bool s = Common_SaveBgr(image->getHeight(), image->getWidth(), image->getChannels(),
-                //    bgr, imageName);
-                //printf("%s,s=%d\n", imageName.data(),s);
             }
             else {
                 LOGE("Common_UnCompressImage error");
             }
-           
         }
 
+        // 收尾：写文件尾、释放资源
         free(bgr);
         bgr = nullptr;
 
-        av_write_trailer(mFmtCtx);//写文件尾
+        av_write_trailer(mFmtCtx);
 
         av_packet_unref(pkt);
         pkt = nullptr;
-
 
         av_free(frame_yuv420p_buff);
         frame_yuv420p_buff = nullptr;
 
         av_frame_free(&frame_yuv420p);
-        //av_frame_unref(frame_yuv420p);
         frame_yuv420p = nullptr;
 
-        
-    }
+        return true;
 }
 
 

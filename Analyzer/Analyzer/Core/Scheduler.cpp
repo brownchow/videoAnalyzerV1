@@ -297,13 +297,13 @@ namespace AVSAnalyzer {
         while (true) {
             // 每1秒检查一次报警队列
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            // 获取报警
+            // 从队列中获取告警图片
             ret = scheduler->getAlarm(alarm, alarmQSize);
             if (ret) {
                 LOGI("发送（1）条报警，剩余待报警=%d,mAlarmImageInstanceCount=%d", alarmQSize, scheduler->mAlarmImageInstanceCount);
                 // 处理报警
                 AVSAlarmManage_HandleAlarm(alarm, "", scheduler->mConfig->rootVideoDir.c_str(), "%Y/%m/%d-%H-%M");
-                // 释放Alarm的图片资源
+                // 将组成告警视频的图片，一张张释放，释放Alarm的图片资源
                 for (int i = 0; i < alarm->images.size(); i++)
                 {
                     AVSAlarmImage* image = alarm->images[i];

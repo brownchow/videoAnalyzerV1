@@ -153,19 +153,27 @@ namespace AVSAlarmManageLib {
     }
 
     /**
-     * 处理报警
+     * 合成告警视频
      * @param alarm 报警对象
      * @param adminHost 管理主机
-     * @param rootVideoDir 视频根目录
-     * @param subVideoDirFormat 子视频目录格式
+     * @param rootVideoDir 合成告警视频，存放目录
+     * @param subVideoDirFormat 合成告警视频，子视频目录格式
      * @return 是否处理成功
      */
     bool AVSAlarmManage_HandleAlarm(AVSAlarm* alarm,
         const char* adminHost,
-        const char* rootVideoDir, const char* subVideoDirFormat) {
-        // 创建视频生成对象并运行
+        const char* rootVideoDir, 
+        const char* subVideoDirFormat) {
+        // 1. 根据报警信息创建一个视频生成器对象。
+        //    GenerateVideo 是负责把报警数据转换成视频文件的类，
+        //    构造时传入 alarm（包括宽高、fps、时间戳等信息）。
         GenerateVideo gen(alarm);
+
+        // 2. 运行视频生成逻辑，将生成的文件写入 rootVideoDir 下，
+        //    并按照 subVideoDirFormat 组织子目录结构。
+        //    例如可以是按日期/小时格式分目录存储。
         gen.run(rootVideoDir, subVideoDirFormat);
+
         return true;
     }
 
